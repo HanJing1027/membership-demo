@@ -17,8 +17,10 @@
 import ToastMessage from '@/components/common/ToastMessage.vue'
 import RegisterForm from '@/components/features/RegisterForm.vue'
 
+import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 
+const router = useRouter()
 const isSubmitting = ref(false)
 
 const toast = ref({
@@ -54,6 +56,12 @@ const handleFormSubmit = async (formData) => {
       type: 'success',
       message: '註冊成功！5秒後跳轉到登入頁面',
     }
+
+    setTimeout(() => {
+      router.push({
+        name: 'Login',
+      })
+    }, 5000)
   } catch (error) {
     console.error('註冊失敗:', error)
 
@@ -73,7 +81,7 @@ const handleFormSubmit = async (formData) => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables.scss' as *;
 
 .register-container {
   display: flex;

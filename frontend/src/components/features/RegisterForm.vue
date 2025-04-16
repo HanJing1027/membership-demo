@@ -16,7 +16,9 @@
       </button>
     </div>
 
-    <div class="form-footer">已有帳號？ <router-link to="/login">前往登入</router-link></div>
+    <div class="form-footer">
+      已有帳號？ <router-link :to="{ name: 'Login' }">前往登入</router-link>
+    </div>
   </form>
 </template>
 
@@ -58,7 +60,8 @@ const handleSubmit = () => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables.scss' as *;
+@use '@/assets/styles/mixins.scss' as *;
 
 .error-message {
   display: block;
@@ -99,7 +102,7 @@ const handleSubmit = () => {
     color: white;
 
     &:hover:not(:disabled) {
-      background-color: darken($primary-color, 10%);
+      background-color: darken-color($primary-color, 10%);
     }
   }
 }
