@@ -16,9 +16,11 @@
 <script setup>
 import ToastMessage from '@/components/common/ToastMessage.vue'
 import RegisterForm from '@/components/features/RegisterForm.vue'
+
 import { ref } from 'vue'
 
 const isSubmitting = ref(false)
+
 const toast = ref({
   show: false,
   type: 'sccess',
