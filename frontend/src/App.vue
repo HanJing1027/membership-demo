@@ -1,5 +1,12 @@
-<script setup></script>
+<template>
+  <div class="app">
+    <Header />
+    <router-view />
+  </div>
+</template>
 
-<template></template>
+<script setup>
+import Header from '@/components/layout/Header.vue'
+</script>
 
 <style scoped></style>
