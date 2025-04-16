@@ -1,0 +1,31 @@
+{
+    "name": "frontend",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+        "lint:fix": "eslint --ext .js,.vue --ignore-path .gitignore . --fix",
+        "format": "prettier --write ."
+    },
+    "dependencies": {
+        "axios": "^1.8.4",
+        "vue": "^3.5.13",
+        "vue-router": "^4.5.0",
+        "vuex": "^4.0.2"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^5.2.1",
+        "eslint": "^9.24.0",
+        "eslint-config-prettier": "^10.1.2",
+        "eslint-plugin-prettier": "^5.2.6",
+        "eslint-plugin-vue": "^10.0.0",
+        "prettier": "^3.5.3",
+        "sass": "^1.86.3",
+        "sass-loader": "^16.0.5",
+        "vite": "^6.2.0"
+    }
+}
