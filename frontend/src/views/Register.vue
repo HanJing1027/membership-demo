@@ -17,6 +17,7 @@
 import ToastMessage from '@/components/common/ToastMessage.vue'
 import RegisterForm from '@/components/features/RegisterForm.vue'
 
+import { membershipApi } from '@/server/api/membershipApi.js'
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 
@@ -50,6 +51,7 @@ const handleFormSubmit = async (formData) => {
     isSubmitting.value = true
 
     //  API 請求
+    await membershipApi.register(formData)
 
     toast.value = {
       show: true,

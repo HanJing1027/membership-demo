@@ -55,7 +55,7 @@ const handleSubmit = () => {
     return
   }
 
-  emit('submit-form', { ...form.value })
+  emit('submit-form', form.value)
 }
 </script>
 
