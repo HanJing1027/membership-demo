@@ -26,7 +26,7 @@ const isSubmitting = ref(false)
 
 const toast = ref({
   show: false,
-  type: 'sccess',
+  type: 'success',
   message: '',
 })
 
@@ -50,16 +50,6 @@ const handleFormSubmit = async (formData) => {
   try {
     isSubmitting.value = true
 
-    const userData = { ...formData }
-    if (!userData.username || !userData.email || !userData.password) {
-      toast.value = {
-        show: true,
-        type: 'error',
-        message: '請填寫所有必填欄位',
-      }
-      return
-    }
-
     //  API 請求
     await membershipApi.register(formData)
 
@@ -70,7 +60,7 @@ const handleFormSubmit = async (formData) => {
     }
 
     setTimeout(() => {
-      router.push({
+      router.replace({
         name: 'Login',
       })
     }, 5000)

@@ -1,33 +1,25 @@
-const HomeView = () => import('../src/views/Home.vue')
-const LoginView = () => import('../src/views/Login.vue')
-const RegisterView = () => import('../src/views/Register.vue')
-const MemberView = () => import('../src/views/Member.vue')
+import authRoutes from './modules/auth.routes'
 
-export const routes = [
+// 創建臨時的用戶中心路由
+const userRoutes = [
   {
-    path: '/',
-    name: 'Home',
-    component: HomeView,
-    meta: { requiresAuth: false, title: 'Home' },
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: LoginView,
-    meta: { requiresAuth: false, title: 'Login' },
-  },
-  {
-    path: '/register',
-    name: 'Register',
-    component: RegisterView,
-    meta: { requiresAuth: false, title: 'Register' },
-  },
-  {
-    path: '/member',
-    name: 'Member',
-    component: MemberView,
-    meta: { requiresAuth: true, title: 'Member' },
+    path: '/user-center',
+    name: 'UserCenter',
+    component: () => import('@/views/UserCenter.vue'),
+    meta: {
+      title: '會員中心',
+      requiresAuth: true,
+    },
   },
 ]
 
-export default routes
+const errorRoutes = [
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/Home.vue'),
+    meta: { title: '頁面不存在' },
+  },
+]
+
+export default [...authRoutes, ...userRoutes, ...errorRoutes]

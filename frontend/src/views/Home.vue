@@ -13,7 +13,7 @@
     </section>
 
     <section class="features">
-      <div class="feature-card">
+      <div class="feature-card" @click="() => router.push({ name: 'UserCenter' })">
         <i class="bx bx-user-circle feature-icon"></i>
         <h3>會員管理</h3>
         <p>輕鬆管理您的個人資訊</p>
@@ -34,7 +34,11 @@
   </main>
 </template>
 
-<script setup></script>
+<script setup>
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+</script>
 
 <style scoped lang="scss">
 @use '@/assets/styles/variables.scss' as *;
@@ -102,6 +106,7 @@
 }
 
 .feature-card {
+  cursor: pointer;
   background-color: white;
   padding: 2rem;
   border-radius: 8px;

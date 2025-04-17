@@ -14,22 +14,22 @@
       </template>
 
       <template v-else>
-        <router-link :to="{ name: 'Member' }" class="nav-link">會員中心</router-link>
-        <a href="#" class="nav-link" @click="logout">登出</a>
+        <router-link :to="{ name: 'UserCenter' }" class="nav-link">會員中心</router-link>
+        <a href="#" class="nav-link" @click.prevent="logout">登出</a>
       </template>
     </div>
   </header>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 
-const isLoggedIn = ref(false)
+const router = useRouter()
+const store = useStore()
 
-const logout = () => {
-  isLoggedIn.value = !isLoggedIn.value
-}
+const isLoggedIn = computed(() => store.getters['auth/isAuthenticated'])
 </script>
 
 <style lang="scss" scoped>
