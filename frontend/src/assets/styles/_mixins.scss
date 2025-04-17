@@ -1,0 +1,10 @@
+@use 'sass:color';
+
+// 顏色工具函數
+@function darken-color($color, $amount) {
+  @return color.adjust($color, $lightness: -$amount);
+}
+
+@function lighten-color($color, $amount) {
+  @return color.adjust($color, $lightness: $amount);
+}

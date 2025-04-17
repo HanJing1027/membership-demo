@@ -17,8 +17,11 @@
 import ToastMessage from '@/components/common/ToastMessage.vue'
 import RegisterForm from '@/components/features/RegisterForm.vue'
 
+import { membershipApi } from '@/server/api/membershipApi.js'
+import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 
+const router = useRouter()
 const isSubmitting = ref(false)
 
 const toast = ref({
@@ -47,20 +50,37 @@ const handleFormSubmit = async (formData) => {
   try {
     isSubmitting.value = true
 
+    const userData = { ...formData }
+    if (!userData.username || !userData.email || !userData.password) {
+      toast.value = {
+        show: true,
+        type: 'error',
+        message: '請填寫所有必填欄位',
+      }
+      return
+    }
+
     //  API 請求
+    await membershipApi.register(formData)
 
     toast.value = {
       show: true,
       type: 'success',
       message: '註冊成功！5秒後跳轉到登入頁面',
     }
+
+    setTimeout(() => {
+      router.push({
+        name: 'Login',
+      })
+    }, 5000)
   } catch (error) {
     console.error('註冊失敗:', error)
 
     toast.value = {
       show: true,
       type: 'error',
-      message: '註冊失敗，請稍後再試。',
+      message: '註冊失敗，請稍後再試',
     }
   } finally {
     isSubmitting.value = false
@@ -73,7 +93,7 @@ const handleFormSubmit = async (formData) => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables.scss' as *;
 
 .register-container {
   display: flex;
@@ -98,5 +118,32 @@ const handleFormSubmit = async (formData) => {
   color: $primary-color;
   font-size: 1.75rem;
   font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .register-container {
+    padding: 1rem;
+  }
+
+  .register-form-wrapper {
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px $shadow-color;
+  }
+
+  .register-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .register-container {
+    padding: 0.5rem;
+  }
+
+  .register-form-wrapper {
+    padding: 1.25rem 1rem;
+    border-radius: 6px;
+  }
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="form-group">
     <label :for="id">{{ label }}</label>
-    <input :type="type" :id="id" class="form-input" v-model="inputModel" required />
+    <input :type="type" :id="id" class="form-input" v-model="inputModel" />
     <slot></slot>
   </div>
 </template>
@@ -26,7 +26,7 @@ const props = defineProps({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables.scss' as *;
 
 .form-group {
   margin-bottom: 1.5rem;
@@ -49,6 +49,17 @@ const props = defineProps({
       outline: none;
       border-color: $primary-color;
       box-shadow: 0 0 0 2px rgba($primary-color, 0.1);
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .form-group {
+    margin-bottom: 1.25rem;
+
+    .form-input {
+      padding: 0.65rem;
+      font-size: 0.95rem;
     }
   }
 }

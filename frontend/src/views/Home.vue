@@ -5,7 +5,7 @@
         <h1>歡迎使用會員系統</h1>
         <p class="subtitle">簡單、快速、安全的會員管理解決方案</p>
         <div class="actions">
-          <router-link to="/register" class="btn btn-primary">
+          <router-link :to="{ name: 'Register' }" class="btn btn-primary">
             <i class="bx bx-log-in-circle"></i> 立即註冊
           </router-link>
         </div>
@@ -37,7 +37,8 @@
 <script setup></script>
 
 <style scoped lang="scss">
-@import '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables.scss' as *;
+@use '@/assets/styles/mixins.scss' as *;
 
 .home {
   max-width: 1200px;
@@ -86,7 +87,7 @@
     color: white;
 
     &:hover {
-      background-color: darken($primary-color, 10%);
+      background-color: darken-color($primary-color, 10%);
       transform: translateY(-2px);
     }
   }
@@ -125,7 +126,7 @@
   }
 
   p {
-    color: lighten($text-color, 20%);
+    color: lighten-color($text-color, 20%);
   }
 }
 </style>

@@ -10,11 +10,11 @@
 
     <div class="header-right">
       <template v-if="!isLoggedIn">
-        <router-link to="/login" class="nav-link">登入</router-link>
+        <router-link :to="{ name: 'Login' }" class="nav-link">登入</router-link>
       </template>
 
       <template v-else>
-        <router-link to="/member" class="nav-link">會員中心</router-link>
+        <router-link :to="{ name: 'Member' }" class="nav-link">會員中心</router-link>
         <a href="#" class="nav-link" @click="logout">登出</a>
       </template>
     </div>
@@ -33,13 +33,13 @@ const logout = () => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables' as *;
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $spacing-standard 2rem;
+  padding: 1rem 2rem;
   background-color: $light-color;
   box-shadow: 0 2px 4px $shadow-color;
 }
