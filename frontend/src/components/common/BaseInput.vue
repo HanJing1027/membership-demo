@@ -52,4 +52,15 @@ const props = defineProps({
     }
   }
 }
+
+@media (max-width: 767px) {
+  .form-group {
+    margin-bottom: 1.25rem;
+
+    .form-input {
+      padding: 0.65rem;
+      font-size: 0.95rem;
+    }
+  }
+}
 </style>

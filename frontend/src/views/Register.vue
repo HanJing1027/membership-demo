@@ -109,4 +109,31 @@ const handleFormSubmit = async (formData) => {
   font-size: 1.75rem;
   font-weight: 600;
 }
+
+@media (max-width: 767px) {
+  .register-container {
+    padding: 1rem;
+  }
+
+  .register-form-wrapper {
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px $shadow-color;
+  }
+
+  .register-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .register-container {
+    padding: 0.5rem;
+  }
+
+  .register-form-wrapper {
+    padding: 1.25rem 1rem;
+    border-radius: 6px;
+  }
+}
 </style>
