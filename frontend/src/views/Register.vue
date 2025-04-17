@@ -50,6 +50,16 @@ const handleFormSubmit = async (formData) => {
   try {
     isSubmitting.value = true
 
+    const userData = { ...formData }
+    if (!userData.username || !userData.email || !userData.password) {
+      toast.value = {
+        show: true,
+        type: 'error',
+        message: '請填寫所有必填欄位',
+      }
+      return
+    }
+
     //  API 請求
     await membershipApi.register(formData)
 
@@ -70,7 +80,7 @@ const handleFormSubmit = async (formData) => {
     toast.value = {
       show: true,
       type: 'error',
-      message: '註冊失敗，請稍後再試。',
+      message: '註冊失敗，請稍後再試',
     }
   } finally {
     isSubmitting.value = false

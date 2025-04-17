@@ -77,7 +77,8 @@ const form = ref({
 const passwordChecks = computed(() => {
   const password = form.value.password
 
-  const legalSymbols = /[!@#$%^&*(),.?":{}|<>]/g
+  // 合法特殊符號
+  const validCharsRegex = /^[a-zA-Z0-9!@#$%^&*(),.?":{}|<>]*$/
 
   return {
     hasNumber: /[0-9]/.test(password),
@@ -85,7 +86,7 @@ const passwordChecks = computed(() => {
     hasUppercase: /[A-Z]/.test(password),
     hasLowercase: /[a-z]/.test(password),
     hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-    hasLegalSymbols: legalSymbols.test(password),
+    hasOnlyValidChars: validCharsRegex.test(password),
   }
 })
 
@@ -153,24 +154,40 @@ const passwordStrength = computed(() => {
 })
 
 const passwordError = computed(() => {
+  if (!form.value.confirmPassword) {
+    return '請輸入確認密碼'
+  }
+
   if (form.value.confirmPassword && form.value.password !== form.value.confirmPassword) {
     return '兩次密碼輸入不一致'
   }
 })
 
 const handleSubmit = () => {
-  if (passwordError.value) {
-    emit('validation-error', new Error('密碼不一致'))
+  // 空密碼檢查
+  if (!form.value.password) {
+    emit('validation-error', new Error('請填寫所有欄位'))
     return
   }
 
-  if (!passwordChecks.value.hasLegalSymbols) {
-    emit('validation-error', new Error('密碼只能包含字母、數字和合法符號'))
+  if (passwordError.value) {
+    emit('validation-error', new Error('兩次密碼不一致'))
     return
   }
 
   if (!isPasswordChecked.value) {
     emit('validation-error', new Error('密碼不符合要求'))
+    return
+  }
+
+  if (!passwordChecks.value.hasOnlyValidChars) {
+    emit('validation-error', new Error('密碼只能包含字母、數字和合法符號'))
+    return
+  }
+
+  // 空確認密碼檢查
+  if (!form.value.confirmPassword) {
+    emit('validation-error', new Error('請輸入確認密碼'))
     return
   }
 
