@@ -67,17 +67,25 @@ const handleFormSubmit = async (formData) => {
   } catch (error) {
     console.error('註冊失敗:', error)
 
-    toast.value = {
-      show: true,
-      type: 'error',
-      message: '註冊失敗，請稍後再試',
+    if (error.response.status === 460) {
+      toast.value = {
+        show: true,
+        type: 'error',
+        message: '註冊失敗，此信箱已註冊',
+      }
+    } else {
+      toast.value = {
+        show: true,
+        type: 'error',
+        message: '註冊失敗，請稍後再試',
+      }
     }
   } finally {
     isSubmitting.value = false
 
     setTimeout(() => {
       toast.value.show = false
-    }, 3000)
+    }, 4000)
   }
 }
 </script>
