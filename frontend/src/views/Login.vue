@@ -98,4 +98,31 @@ const handleFormSubmit = async (formData) => {
   font-size: 1.75rem;
   font-weight: 600;
 }
+
+@media (max-width: 767px) {
+  .login-container {
+    padding: 1rem;
+  }
+
+  .login-form-wrapper {
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px $shadow-color;
+  }
+
+  .login-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .login-container {
+    padding: 0.5rem;
+  }
+
+  .login-form-wrapper {
+    padding: 1.25rem 1rem;
+    border-radius: 6px;
+  }
+}
 </style>
