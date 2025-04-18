@@ -20,4 +20,13 @@ export const membershipApi = {
   },
 
   // 登入
+  login: async (userData) => {
+    try {
+      const response = await axios.post('/api/login', userData)
+      return response.datae
+    } catch (error) {
+      handleError(error)
+      throw error
+    }
+  },
 }
