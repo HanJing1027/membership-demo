@@ -1,25 +1,17 @@
-import authRoutes from './modules/auth.routes'
-
-// 創建臨時的用戶中心路由
-const userRoutes = [
-  {
-    path: '/user-center',
-    name: 'UserCenter',
-    component: () => import('@/views/UserCenter.vue'),
-    meta: {
-      title: '會員中心',
-      requiresAuth: true,
-    },
-  },
-]
+import authRoutes from './modules/auth.routes.js'
+import userRoutes from './modules/user.routes.js'
+import publicRoutes from './modules/public.roures.js'
 
 const errorRoutes = [
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('@/views/Home.vue'),
-    meta: { title: '頁面不存在' },
+    component: () => import('@/views/NotFound.vue'),
+    meta: {
+      title: '頁面不存在',
+      requiresAuth: false,
+    },
   },
 ]
 
-export default [...authRoutes, ...userRoutes, ...errorRoutes]
+export default [...publicRoutes, ...authRoutes, ...userRoutes, ...errorRoutes]
