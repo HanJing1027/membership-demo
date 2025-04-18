@@ -1,33 +1,17 @@
-const HomeView = () => import('../src/views/Home.vue')
-const LoginView = () => import('../src/views/Login.vue')
-const RegisterView = () => import('../src/views/Register.vue')
-const MemberView = () => import('../src/views/Member.vue')
+import authRoutes from './modules/auth.routes.js'
+import userRoutes from './modules/user.routes.js'
+import publicRoutes from './modules/public.roures.js'
 
-export const routes = [
+const errorRoutes = [
   {
-    path: '/',
-    name: 'Home',
-    component: HomeView,
-    meta: { requiresAuth: false, title: 'Home' },
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: LoginView,
-    meta: { requiresAuth: false, title: 'Login' },
-  },
-  {
-    path: '/register',
-    name: 'Register',
-    component: RegisterView,
-    meta: { requiresAuth: false, title: 'Register' },
-  },
-  {
-    path: '/member',
-    name: 'Member',
-    component: MemberView,
-    meta: { requiresAuth: true, title: 'Member' },
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/NotFound.vue'),
+    meta: {
+      title: '頁面不存在',
+      requiresAuth: false,
+    },
   },
 ]
 
-export default routes
+export default [...publicRoutes, ...authRoutes, ...userRoutes, ...errorRoutes]

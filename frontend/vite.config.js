@@ -18,7 +18,6 @@ export default defineConfig(({ mode }) => {
           // 使用環境變數作為目標
           target: env.VITE_API_BASE_URL || 'http://localhost:8000',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/backend/, ''),
         },
       },
     },
