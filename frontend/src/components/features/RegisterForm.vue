@@ -78,7 +78,7 @@ const passwordChecks = computed(() => {
   const password = form.value.password
 
   // 合法特殊符號
-  const validCharsRegex = /^[a-zA-Z0-9!@#$%^&*(),.?":{}|<>]*$/
+  const symbolRegex = /^[a-zA-Z0-9!@#$%^&*(),.?":{}|<>]*$/
 
   return {
     hasNumber: /[0-9]/.test(password),
@@ -86,7 +86,7 @@ const passwordChecks = computed(() => {
     hasUppercase: /[A-Z]/.test(password),
     hasLowercase: /[a-z]/.test(password),
     hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-    hasOnlyValidChars: validCharsRegex.test(password),
+    hasOnlyAllowedSymbols: symbolRegex.test(password),
   }
 })
 
@@ -164,8 +164,8 @@ const passwordError = computed(() => {
 })
 
 const handleSubmit = () => {
-  // 空密碼檢查
-  if (!form.value.password) {
+  // 檢查所有必填的欄位
+  if (!form.value.username || !form.value.email || !form.value.password) {
     emit('validation-error', new Error('請填寫所有欄位'))
     return
   }
@@ -180,7 +180,7 @@ const handleSubmit = () => {
     return
   }
 
-  if (!passwordChecks.value.hasOnlyValidChars) {
+  if (!passwordChecks.value.hasOnlyAllowedSymbols) {
     emit('validation-error', new Error('密碼只能包含字母、數字和合法符號'))
     return
   }
