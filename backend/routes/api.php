@@ -36,6 +36,12 @@ Route::post('/register',function (Request $request) {
     return response()->json(['message' => 'User registered successfully'], 201);
   }
   catch (\Exception $e){
-    return response()->json(['message' => 'User registration failed', 'error' => $e->getMessage()], 500);
+    //已經有這個email了
+    if ($e->getMessage() == "The email has already been taken.") {
+      return response()->json(['message' => 'Email already exists'], 460);
+    }
+    else{
+      return response()->json(['message' => 'User registration failed', 'error' => $e->getMessage()], 500);
+    }    
   }
 })->name('register');
