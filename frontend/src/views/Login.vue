@@ -16,8 +16,10 @@
 <script setup>
 import ToastMessage from '@/components/common/ToastMessage.vue'
 import LoginForm from '@/components/features/LoginForm.vue'
+
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { membershipApi } from '@/server/api/membershipApi.js'
 
 const router = useRouter()
 
@@ -50,6 +52,7 @@ const handleFormSubmit = async (formData) => {
     isSubmitting.value = true
 
     // API 請求
+    await membershipApi.login(formData)
 
     router.replace({ name: 'Home' })
   } catch (error) {
