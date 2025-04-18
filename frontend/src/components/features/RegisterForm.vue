@@ -191,7 +191,10 @@ const handleSubmit = () => {
     return
   }
 
-  emit('submit-form', form.value)
+  // 解構提取所需欄位，排除 confirmPassword
+  const { confirmPassword, ...formData } = form.value
+
+  emit('submit-form', formData)
 }
 </script>
 
