@@ -29,6 +29,7 @@
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
+import { membershipApi } from '@/server/api/membershipApi.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -36,7 +37,9 @@ const store = useStore()
 
 const isLoggedIn = computed(() => store.getters['auth/isAuthenticated'])
 
-const logout = () => {
+const logout = async () => {
+  await membershipApi.logout()
+
   store.dispatch('auth/logout')
 
   if (route.meta.requiresAuth) {
