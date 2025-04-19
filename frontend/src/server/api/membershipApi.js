@@ -23,7 +23,7 @@ export const membershipApi = {
   login: async (userData) => {
     try {
       const response = await axios.post('/api/login', userData)
-      return response.datae
+      return response.data
     } catch (error) {
       handleError(error)
       throw error
