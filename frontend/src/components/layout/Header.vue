@@ -9,6 +9,9 @@
     </div>
 
     <div class="header-right">
+      <router-link :to="{ name: 'Home' }" class="nav-link">首頁</router-link>
+      <router-link :to="{ name: 'SecurityInfo' }" class="nav-link">安全資訊</router-link>
+
       <template v-if="!isLoggedIn">
         <router-link :to="{ name: 'Login' }" class="nav-link">登入</router-link>
       </template>

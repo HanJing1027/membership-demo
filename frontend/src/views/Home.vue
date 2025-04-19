@@ -19,7 +19,7 @@
         <p>輕鬆管理您的個人資訊</p>
       </div>
 
-      <div class="feature-card">
+      <div class="feature-card" @click="() => router.push({ name: 'SecurityInfo' })">
         <i class="bx bx-shield-quarter feature-icon"></i>
         <h3>安全保障</h3>
         <p>您的資料安全是我們的首要任務</p>
