@@ -9,6 +9,12 @@ export default [
     },
   },
   {
-    //
+    path: '/security-info',
+    name: 'SecurityInfo',
+    component: () => import('@/views/SecurityInfo.vue'),
+    meta: {
+      title: '安全保障',
+      requiresAuth: false,
+    },
   },
 ]

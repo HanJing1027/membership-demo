@@ -19,9 +19,11 @@ import LoginForm from '@/components/features/LoginForm.vue'
 
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import { membershipApi } from '@/server/api/membershipApi.js'
 
 const router = useRouter()
+const store = useStore()
 
 const isSubmitting = ref(false)
 
@@ -52,9 +54,16 @@ const handleFormSubmit = async (formData) => {
     isSubmitting.value = true
 
     // API 請求
-    await membershipApi.login(formData)
+    const response = await membershipApi.login(formData)
+    const { username } = response
+    const { token, expiresIn } = response.authorization
 
-    router.replace({ name: 'Home' })
+    store.dispatch('auth/login', { token, username, expiresIn })
+
+    // 登入成功後 重新導向至使用者原本想進入的頁面（如果有）
+    // 如果沒有 redirect 查詢參數 預設跳轉至首頁
+    const redirectPath = router.currentRoute.value.query.redirect
+    router.replace(redirectPath || { name: 'Home' })
   } catch (error) {
     console.error('表單提交錯誤:', error)
 

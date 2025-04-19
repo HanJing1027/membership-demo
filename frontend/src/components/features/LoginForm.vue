@@ -2,7 +2,7 @@
   <form class="">
     <BaseInput label="帳號/信箱" type="email" id="email" v-model="form.email" />
 
-    <BaseInput label="密碼" type="email" id="email" v-model="form.password" />
+    <BaseInput label="密碼" type="password" id="password" v-model="form.password" />
 
     <div class="form-actions">
       <button
