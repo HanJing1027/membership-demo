@@ -79,7 +79,7 @@ Route::post('/login', function (Request $request) {
 #region 登出
 Route::post('/logout', function (Request $request) {
   try {
-    Auth::logout();
+    Auth::guard('api')->logout();
     return response()->json(['message' => 'User logged out successfully']);
   } catch (\Exception $e) {
     return response()->json(['message' => 'Logout failed', 'error' => $e->getMessage()], 500);
@@ -102,4 +102,29 @@ Route::post('/refresh', function (Request $request) {
     return response()->json(['message' => 'Token refresh failed', 'error' => $e->getMessage()], 500);
   }
 })->name('refresh');
+#endregion
+
+#region 受保護的資料路由
+Route::middleware('auth:api')->get('/protected-data', function (Request $request) {
+  try {
+    // 獲取當前認證用戶
+    $user = Auth::guard('api')->user();
+    
+    // 返回受保護的資料和用戶信息
+    return response()->json([
+      'message' => '成功獲取受保護資料',
+      'user_info' => [
+        'id' => $user->id,
+        'username' => $user->username,
+        'email' => $user->email,
+      ],
+      'data' => [
+        'sensitive_info' => '這是僅限授權用戶查看的敏感資訊',
+        'timestamp' => now()->toDateTimeString(),
+      ]
+    ]);
+  } catch (\Exception $e) {
+    return response()->json(['message' => '獲取資料失敗', 'error' => $e->getMessage()], 500);
+  }
+})->name('protected-data');
 #endregion
