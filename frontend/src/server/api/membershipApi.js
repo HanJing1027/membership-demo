@@ -1,5 +1,7 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import store from '../../../store/index.js'
+import router from '../../../router/index.js'
 
 const api = axios.create()
 const TOKEN_KEY = 'auth_token' // 需要和 auth.js 中使用的常數一致
@@ -16,6 +18,15 @@ api.interceptors.request.use((config) => {
     }
   }
   return config
+})
+
+api.interceptors.response.use((response) => {
+  if (response.status === 401) {
+    store.dispatch('auth/logout')
+    // 這裡可以加入跳轉到登入頁的邏輯
+    router.push('/')
+  }
+  return response
 })
 
 const handleError = (error) => {
@@ -52,6 +63,17 @@ export const membershipApi = {
   logout: async () => {
     try {
       const response = await api.post('/api/logout')
+      return response.data
+    } catch (error) {
+      handleError(error)
+      throw error
+    }
+  },
+
+  // refresh token
+  refreshToken: async () => {
+    try {
+      const response = await api.post('/api/refresh')
       return response.data
     } catch (error) {
       handleError(error)

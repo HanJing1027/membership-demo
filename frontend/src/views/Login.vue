@@ -44,9 +44,9 @@ const handleFormSubmit = async (formData) => {
     // API 請求
     const response = await membershipApi.login(formData)
     const { username } = response
-    const { token, expiresIn } = response.authorization
+    const { token } = response.authorization
 
-    store.dispatch('auth/login', { token, username, expiresIn })
+    store.dispatch('auth/login', { token, username })
 
     // 登入成功後 重新導向至使用者原本想進入的頁面（如果有）
     // 如果沒有 redirect 查詢參數 預設跳轉至首頁

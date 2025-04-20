@@ -9,6 +9,7 @@
 <script setup>
 import Header from '@/components/layout/Header.vue'
 import ToastMessage from './components/common/ToastMessage.vue'
+import Cookies from 'js-cookie'
 
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
