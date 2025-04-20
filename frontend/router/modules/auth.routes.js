@@ -5,7 +5,6 @@ export default [
     component: () => import('@/views/Login.vue'),
     meta: {
       title: '登入',
-      layout: 'guest',
       guestOnly: true,
     },
   },
@@ -15,7 +14,6 @@ export default [
     component: () => import('@/views/Register.vue'),
     meta: {
       title: '註冊',
-      layout: 'guest',
       guestOnly: true,
     },
   },
