@@ -66,8 +66,8 @@ Route::post('/login', function (Request $request) {
       'username' => Auth::guard('api')->user()->username,
       'authorization' => [
         'token' => $token,
-        'type' => 'bearer',
-        'expires_in' => config('jwt.ttl'), // token有效時間
+        // 'type' => 'bearer',
+        // 'expires_in' => config('jwt.ttl'), // token有效時間
       ]
     ]);
   } catch (\Exception $e) {
@@ -94,12 +94,18 @@ Route::post('/refresh', function (Request $request) {
     return response()->json([
       'authorization' => [
         'token' => $token,
-        'type' => 'bearer',
-        'expires_in' => config('jwt.ttl'), // token有效時間
+        // 'type' => 'bearer',
+        // 'expires_in' => config('jwt.ttl'), // token有效時間
       ]
     ]);
   } catch (\Exception $e) {
-    return response()->json(['message' => 'Token refresh failed', 'error' => $e->getMessage()], 500);
+    
+    if($e->getMessage() == "Token has expired and can no longer be refreshed"){
+      return response()->json(['message' => 'Token is died'], 401);
+    }
+    else{
+      return response()->json(['message' => 'Token refresh failed', 'error' => $e->getMessage()], 500);
+    }
   }
 })->name('refresh');
 #endregion
