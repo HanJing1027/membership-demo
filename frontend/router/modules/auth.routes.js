@@ -17,4 +17,23 @@ export default [
       guestOnly: true,
     },
   },
+  {
+    path: '/otp-form',
+    name: 'OtpForm',
+    component: () => import('@/views/OtpForm.vue'),
+    meta: {
+      title: '驗證碼',
+      otpOnly: true,
+    },
+  },
+  {
+    path: '/register/success',
+    name: 'RegisterSuccess',
+    component: () => import('@/views/RegisterSuccess.vue'),
+    meta: {
+      title: '註冊成功',
+      guestOnly: true,
+      RegistrationProcessRequired: true, // 需要註冊流程
+    },
+  },
 ]

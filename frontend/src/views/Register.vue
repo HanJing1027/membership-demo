@@ -14,6 +14,7 @@
 
 <script setup>
 import RegisterForm from '@/components/features/RegisterForm.vue'
+import Cookies from 'js-cookie'
 
 import { membershipApi } from '@/server/api/membershipApi.js'
 import { useRouter } from 'vue-router'
@@ -40,20 +41,19 @@ const handleFormSubmit = async (formData) => {
   try {
     isSubmitting.value = true
 
+    const { email } = formData
+    Cookies.set('otpEmail', email)
+
     //  API 請求
     await membershipApi.register(formData)
 
     store.dispatch('toast/showToast', {
       show: true,
       type: 'success',
-      message: '註冊成功！5秒後跳轉到登入頁面',
+      message: '已寄出驗證信件，請至信箱收取',
     })
 
-    setTimeout(() => {
-      router.replace({
-        name: 'Login',
-      })
-    }, 5000)
+    router.replace({ name: 'OtpForm' })
   } catch (error) {
     console.error('註冊失敗:', error)
 
