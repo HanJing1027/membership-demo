@@ -1,5 +1,4 @@
 <template>
-  <ToastMessage :toast="toast" />
   <div class="register-container">
     <div class="register-form-wrapper">
       <h1 class="register-title">註冊帳號</h1>
@@ -14,35 +13,26 @@
 </template>
 
 <script setup>
-import ToastMessage from '@/components/common/ToastMessage.vue'
 import RegisterForm from '@/components/features/RegisterForm.vue'
 
 import { membershipApi } from '@/server/api/membershipApi.js'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import { ref } from 'vue'
 
 const router = useRouter()
+const store = useStore()
 const isSubmitting = ref(false)
-
-const toast = ref({
-  show: false,
-  type: 'success',
-  message: '',
-})
 
 const handleValidationError = (error) => {
   try {
-    toast.value = {
+    store.dispatch('toast/showToast', {
       show: true,
       type: 'error',
       message: error.message,
-    }
+    })
   } catch (error) {
     console.error('驗證錯誤:', error)
-  } finally {
-    setTimeout(() => {
-      toast.value.show = false
-    }, 3000)
   }
 }
 
@@ -53,11 +43,11 @@ const handleFormSubmit = async (formData) => {
     //  API 請求
     await membershipApi.register(formData)
 
-    toast.value = {
+    store.dispatch('toast/showToast', {
       show: true,
       type: 'success',
       message: '註冊成功！5秒後跳轉到登入頁面',
-    }
+    })
 
     setTimeout(() => {
       router.replace({
@@ -68,24 +58,20 @@ const handleFormSubmit = async (formData) => {
     console.error('註冊失敗:', error)
 
     if (error.response.status === 460) {
-      toast.value = {
+      store.dispatch('toast/showToast', {
         show: true,
         type: 'error',
         message: '註冊失敗，此信箱已註冊',
-      }
+      })
     } else {
-      toast.value = {
+      store.dispatch('toast/showToast', {
         show: true,
         type: 'error',
         message: '註冊失敗，請稍後再試',
-      }
+      })
     }
   } finally {
     isSubmitting.value = false
-
-    setTimeout(() => {
-      toast.value.show = false
-    }, 4000)
   }
 }
 </script>

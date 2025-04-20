@@ -17,4 +17,13 @@ export default [
       requiresAuth: false,
     },
   },
+  {
+    path: '/support-center',
+    name: 'SupportCenter',
+    component: () => import('@/views/SupportCenter.vue'),
+    meta: {
+      title: '客服中心',
+      requiresAuth: false,
+    },
+  },
 ]

@@ -11,6 +11,7 @@
     <div class="header-right">
       <router-link :to="{ name: 'Home' }" class="nav-link">首頁</router-link>
       <router-link :to="{ name: 'SecurityInfo' }" class="nav-link">安全資訊</router-link>
+      <router-link :to="{ name: 'SupportCenter' }" class="nav-link">支援中心</router-link>
 
       <template v-if="!isLoggedIn">
         <router-link :to="{ name: 'Login' }" class="nav-link">登入</router-link>
@@ -28,6 +29,7 @@
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
+import { membershipApi } from '@/server/api/membershipApi.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -35,7 +37,9 @@ const store = useStore()
 
 const isLoggedIn = computed(() => store.getters['auth/isAuthenticated'])
 
-const logout = () => {
+const logout = async () => {
+  await membershipApi.logout()
+
   store.dispatch('auth/logout')
 
   if (route.meta.requiresAuth) {

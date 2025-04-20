@@ -1,5 +1,4 @@
 <template>
-  <ToastMessage :toast="toast" />
   <div class="login-container">
     <div class="login-form-wrapper">
       <h1 class="login-title">登入帳號</h1>
@@ -14,7 +13,6 @@
 </template>
 
 <script setup>
-import ToastMessage from '@/components/common/ToastMessage.vue'
 import LoginForm from '@/components/features/LoginForm.vue'
 
 import { ref } from 'vue'
@@ -27,25 +25,15 @@ const store = useStore()
 
 const isSubmitting = ref(false)
 
-const toast = ref({
-  show: false,
-  type: 'success',
-  message: '',
-})
-
 const handleValidationError = (error) => {
   try {
-    toast.value = {
+    store.dispatch('toast/showToast', {
       show: true,
       type: 'error',
       message: error.message,
-    }
+    })
   } catch (error) {
     console.error('驗證錯誤:', error)
-  } finally {
-    setTimeout(() => {
-      toast.value.show = false
-    }, 3000)
   }
 }
 
@@ -64,6 +52,13 @@ const handleFormSubmit = async (formData) => {
     // 如果沒有 redirect 查詢參數 預設跳轉至首頁
     const redirectPath = router.currentRoute.value.query.redirect
     router.replace(redirectPath || { name: 'Home' })
+
+    // 顯示登入成功的提示
+    store.dispatch('toast/showToast', {
+      show: true,
+      type: 'success',
+      message: '登入成功！',
+    })
   } catch (error) {
     console.error('表單提交錯誤:', error)
 
@@ -74,10 +69,6 @@ const handleFormSubmit = async (formData) => {
     }
   } finally {
     isSubmitting.value = false
-
-    setTimeout(() => {
-      toast.value.show = false
-    }, 4000)
   }
 }
 </script>

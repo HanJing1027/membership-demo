@@ -25,7 +25,7 @@
         <p>您的資料安全是我們的首要任務</p>
       </div>
 
-      <div class="feature-card">
+      <div class="feature-card" @click="() => router.push({ name: 'SupportCenter' })">
         <i class="bx bx-support feature-icon"></i>
         <h3>專業支援</h3>
         <p>隨時為您解答問題</p>
