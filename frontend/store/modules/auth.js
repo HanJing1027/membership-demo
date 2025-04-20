@@ -72,7 +72,7 @@ export default {
           sameSite: 'Strict', // 嚴格模式防止 CSRF 攻擊
         })
       } catch (error) {
-        console.error('刷新 token 失敗:', error)
+        // console.error('刷新 token 失敗:', error)
       }
     },
 
@@ -90,6 +90,16 @@ export default {
         Cookies.remove(TOKEN_KEY)
         Cookies.remove(USER_KEY)
       }
+    },
+
+    // 強退
+    forceLogout(context) {
+      // 清除狀態
+      context.commit('REMOVE_AUTH')
+
+      // 清除 cookie
+      Cookies.remove(TOKEN_KEY)
+      Cookies.remove(USER_KEY)
     },
   },
 }

@@ -20,14 +20,19 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-api.interceptors.response.use((response) => {
-  if (response.status === 401) {
-    store.dispatch('auth/logout')
-    // 這裡可以加入跳轉到登入頁的邏輯
-    router.push('/')
+api.interceptors.response.use(
+  (response) => {
+    return response
+  },
+  (error) => {
+    if (error.response.status === 401) {
+      store.dispatch('auth/forceLogout')
+      // 這裡可以加入跳轉到登入頁的邏輯
+      router.replace('/')
+    }
+    return Promise.reject(error)
   }
-  return response
-})
+)
 
 const handleError = (error) => {
   if (error.response) {
@@ -62,8 +67,7 @@ export const membershipApi = {
   // 登出
   logout: async () => {
     try {
-      const response = await api.post('/api/logout')
-      return response.data
+      await api.post('/api/logout')
     } catch (error) {
       handleError(error)
       throw error
@@ -76,8 +80,8 @@ export const membershipApi = {
       const response = await api.post('/api/refresh')
       return response.data
     } catch (error) {
-      handleError(error)
-      throw error
+      // handleError(error)
+      // throw error
     }
   },
 }
