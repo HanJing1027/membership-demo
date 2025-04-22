@@ -74,7 +74,7 @@ export const membershipApi = {
     }
   },
 
-  // refresh token
+  // 刷新 token
   refreshToken: async () => {
     try {
       const response = await api.post('/api/refresh')
@@ -82,6 +82,27 @@ export const membershipApi = {
     } catch (error) {
       // handleError(error)
       // throw error
+    }
+  },
+
+  // 重送 OTP
+  resendOtp: async (email) => {
+    try {
+      const response = await api.post('/api/resend-otp', email)
+      return response.data
+    } catch (error) {
+      handleError(error)
+      throw error
+    }
+  },
+
+  sendOtp: async (otpCode) => {
+    try {
+      const response = await api.post('/api/send-otp', otpCode)
+      return response.data
+    } catch (error) {
+      handleError(error)
+      throw error
     }
   },
 }

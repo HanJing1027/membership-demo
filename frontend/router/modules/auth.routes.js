@@ -23,6 +23,7 @@ export default [
     component: () => import('@/views/OtpForm.vue'),
     meta: {
       title: '驗證碼',
+      guestOnly: true,
       otpOnly: true,
     },
   },

@@ -60,13 +60,11 @@ const handleFormSubmit = async (formData) => {
       message: '登入成功！',
     })
   } catch (error) {
-    console.error('表單提交錯誤:', error)
-
-    toast.value = {
+    store.dispatch('toast/showToast', {
       show: true,
       type: 'error',
       message: '請檢查信箱/帳號或密碼是否正確',
-    }
+    })
   } finally {
     isSubmitting.value = false
   }
