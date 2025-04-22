@@ -111,6 +111,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearInterval(timer.value)
+
+  // 離開頁面時清除 Cookies 中的信箱
+  Cookies.remove('otpEmail')
 })
 </script>
 
