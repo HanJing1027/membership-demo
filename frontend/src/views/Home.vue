@@ -5,9 +5,16 @@
         <h1>歡迎使用會員系統</h1>
         <p class="subtitle">簡單、快速、安全的會員管理解決方案</p>
         <div class="actions">
-          <router-link :to="{ name: 'Register' }" class="btn btn-primary">
+          <router-link v-if="!isAuthenticated" :to="{ name: 'Register' }" class="btn btn-primary">
             <i class="bx bx-log-in-circle"></i> 立即註冊
           </router-link>
+
+          <div v-else class="welcome-message">
+            <i class="bx bx-user"></i>
+            <span
+              >歡迎回來，<strong>{{ user }}</strong></span
+            >
+          </div>
         </div>
       </div>
     </section>
@@ -36,8 +43,14 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+import { computed } from 'vue'
 
 const router = useRouter()
+const store = useStore()
+
+const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
+const user = computed(() => store.getters['auth/currentUser'])
 </script>
 
 <style scoped lang="scss">
@@ -93,6 +106,27 @@ const router = useRouter()
     &:hover {
       background-color: darken-color($primary-color, 10%);
       transform: translateY(-2px);
+    }
+  }
+
+  .welcome-message {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: $light-color;
+    border-left: 4px solid $primary-color;
+    border-radius: 4px;
+    font-size: 1.1rem;
+
+    i {
+      font-size: 1.25rem;
+      color: $primary-color;
+    }
+
+    strong {
+      color: $primary-color;
+      font-weight: 600;
     }
   }
 }

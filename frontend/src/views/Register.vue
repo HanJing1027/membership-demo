@@ -42,7 +42,9 @@ const handleFormSubmit = async (formData) => {
     isSubmitting.value = true
 
     const { email } = formData
-    Cookies.set('otpEmail', email)
+    Cookies.set('otpEmail', email, {
+      sameSite: 'Strict', // 嚴格模式防止 CSRF 攻擊
+    })
 
     //  API 請求
     await membershipApi.register(formData)

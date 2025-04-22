@@ -4,7 +4,7 @@ import store from '../../../store/index.js'
 import router from '../../../router/index.js'
 
 const api = axios.create()
-const TOKEN_KEY = 'auth_token' // 需要和 auth.js 中使用的常數一致
+const TOKEN_KEY = 'auth_token' // 需要和 vuex auth.js 中使用的常數一致
 
 // 登入、註冊不需要攜帶 JWT
 const EXCLUDED_URLS = ['/api/login', '/api/register']
