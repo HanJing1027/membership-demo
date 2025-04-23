@@ -4,7 +4,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use SadiqSalau\LaravelOtp\Facades\Otp;
+use Illuminate\Support\Facades\Notification;
+use App\Otp\mailotp;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +18,7 @@ use Illuminate\Support\Facades\Hash;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
   return $request->user();
@@ -31,12 +34,15 @@ Route::post('/register', function (Request $request) {
       'password' => 'required|string',
     ]);
 
-    $user = User::create([
-      'username' => $request->username,       // 現在兩處欄位名稱一致
-      'email' => $request->email,
-      'password' => Hash::make($request->password),
-    ]);
-    return response()->json(['message' => 'User registered successfully'], 201);
+    $otp = Otp::identifier($request->email)->send(
+      new mailotp(
+        $request->username,
+        $request->email,
+        $request->password
+      ),
+      Notification::route('mail', $request->email)
+    );
+    return response()->json(['message' => $otp['status']], 201);
   } catch (\Exception $e) {
     //已經有這個email了
     if ($e->getMessage() == "The email has already been taken.") {
@@ -46,6 +52,24 @@ Route::post('/register', function (Request $request) {
     }
   }
 })->name('register');
+
+Route::post('/verify', function (Request $request) {
+  try {
+    $request->validate([
+      'email' => 'required|string|email',
+      'otp' => 'required|string',
+    ]);
+
+    $otp = Otp::identifier($request->email)->attempt($request->otp);
+    if ($otp['status'] == Otp::OTP_PROCESSED) {
+      return response()->json(['message' => 'OTP verified successfully']);
+    } else {
+      return response()->json(['message' => 'Invalid OTP'], 401);
+    }
+  } catch (\Exception $e) {
+    return response()->json(['message' => 'OTP verification failed', 'error' => $e->getMessage()], 400);
+  }
+})->name('verify');
 
 #endregion
 
@@ -99,11 +123,9 @@ Route::post('/refresh', function (Request $request) {
       ]
     ]);
   } catch (\Exception $e) {
-    
-    if($e->getMessage() == "Token has expired and can no longer be refreshed"){
+    if ($e->getMessage() == "Token has expired and can no longer be refreshed") {
       return response()->json(['message' => 'Token is died'], 401);
-    }
-    else{
+    } else {
       return response()->json(['message' => 'Token refresh failed', 'error' => $e->getMessage()], 500);
     }
   }
@@ -115,7 +137,7 @@ Route::middleware('auth:api')->get('/protected-data', function (Request $request
   try {
     // 獲取當前認證用戶
     $user = Auth::guard('api')->user();
-    
+
     // 返回受保護的資料和用戶信息
     return response()->json([
       'message' => '成功獲取受保護資料',
