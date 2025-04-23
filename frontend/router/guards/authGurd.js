@@ -23,7 +23,11 @@ export function authGuard(to, from) {
   }
 
   // 註冊流程守衛
-  if (!to.meta.RegistrationProcessRequired) {
-    //
+  if (to.meta.RegistrationProcessRequired) {
+    const isFromOtpPage = from.name === 'OtpForm'
+
+    if (!isFromOtpPage) {
+      return { name: 'Register' }
+    }
   }
 }
