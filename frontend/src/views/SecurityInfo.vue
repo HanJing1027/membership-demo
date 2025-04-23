@@ -26,7 +26,7 @@
     <div class="security-contact">
       <h2>有安全疑慮？</h2>
       <p>如果您有任何安全問題或有疑慮，可以與我們聯繫詢問</p>
-      <div class="contact-button"><i class="bx bx-envelope"></i> 0123456@gmail.com</div>
+      <div class="contact-button"><i class="bx bx-envelope"></i>0123456@example.com</div>
     </div>
   </div>
 </template>

@@ -44,9 +44,9 @@ const handleFormSubmit = async (formData) => {
     // API 請求
     const response = await membershipApi.login(formData)
     const { username } = response
-    const { token, expiresIn } = response.authorization
+    const { token } = response.authorization
 
-    store.dispatch('auth/login', { token, username, expiresIn })
+    store.dispatch('auth/login', { token, username })
 
     // 登入成功後 重新導向至使用者原本想進入的頁面（如果有）
     // 如果沒有 redirect 查詢參數 預設跳轉至首頁
@@ -60,13 +60,11 @@ const handleFormSubmit = async (formData) => {
       message: '登入成功！',
     })
   } catch (error) {
-    console.error('表單提交錯誤:', error)
-
-    toast.value = {
+    store.dispatch('toast/showToast', {
       show: true,
       type: 'error',
       message: '請檢查信箱/帳號或密碼是否正確',
-    }
+    })
   } finally {
     isSubmitting.value = false
   }

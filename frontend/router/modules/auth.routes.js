@@ -5,7 +5,6 @@ export default [
     component: () => import('@/views/Login.vue'),
     meta: {
       title: '登入',
-      layout: 'guest',
       guestOnly: true,
     },
   },
@@ -15,8 +14,27 @@ export default [
     component: () => import('@/views/Register.vue'),
     meta: {
       title: '註冊',
-      layout: 'guest',
       guestOnly: true,
+    },
+  },
+  {
+    path: '/otp-form',
+    name: 'OtpForm',
+    component: () => import('@/views/OtpForm.vue'),
+    meta: {
+      title: '驗證碼',
+      guestOnly: true,
+      otpOnly: true,
+    },
+  },
+  {
+    path: '/register/success',
+    name: 'RegisterSuccess',
+    component: () => import('@/views/RegisterSuccess.vue'),
+    meta: {
+      title: '註冊成功',
+      guestOnly: true,
+      RegistrationProcessRequired: true, // 需要註冊流程
     },
   },
 ]
