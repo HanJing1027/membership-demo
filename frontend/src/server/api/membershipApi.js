@@ -26,9 +26,13 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response.status === 401) {
-      store.dispatch('auth/forceLogout')
-      // 這裡可以加入跳轉到登入頁的邏輯
-      router.replace('/')
+      const isOtpError = error.response.config.url.includes('/api/verify')
+
+      // 確保所有錯誤都會通過Promise.reject(error)正確傳遞到調用的地方
+      if (!isOtpError) {
+        store.dispatch('auth/forceLogout')
+        router.replace('/')
+      }
     }
     return Promise.reject(error)
   }
@@ -96,9 +100,9 @@ export const membershipApi = {
     }
   },
 
-  sendOtp: async (otpCode) => {
+  verifyOtp: async (otpCode) => {
     try {
-      const response = await api.post('/api/send-otp', otpCode)
+      const response = await api.post('/api/verify', otpCode)
       return response.data
     } catch (error) {
       handleError(error)

@@ -83,13 +83,12 @@ const handleSendOtpCode = async () => {
     isSubmitting.value = true
 
     // api請求
-    await membershipApi.sendOtp({ otpCode: otpCode.value })
+    await membershipApi.verifyOtp({ otp: otpCode.value, email: email })
 
     // 成功後跳轉頁面
     router.replace({ name: 'RegisterSuccess' })
   } catch (error) {
     errorMessage.value = '驗證碼錯誤，請重新輸入'
-  } finally {
     isSubmitting.value = false
   }
 }
