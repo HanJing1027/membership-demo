@@ -62,7 +62,7 @@ Route::post('/verify', function (Request $request) {
 
     $otp = Otp::identifier($request->email)->attempt($request->otp);
     if ($otp['status'] == Otp::OTP_PROCESSED) {
-      return response()->json(['message' => 'OTP verified successfully']);
+      return response()->json(['message' => 'OTP verified successfully'],200);
     } else {
       return response()->json(['message' => 'Invalid OTP'], 401);
     }
@@ -70,6 +70,26 @@ Route::post('/verify', function (Request $request) {
     return response()->json(['message' => 'OTP verification failed', 'error' => $e->getMessage()], 400);
   }
 })->name('verify');
+
+Route::post('resendotp', function (Request $request) {
+  try {
+    $request->validate([
+      'email' => 'required|string|email',
+    ]);
+
+    $otp = Otp::identifier($request->email)->update();
+    if($otp['status'] != Otp::OTP_SENT)
+    {
+      return response()->json([
+        'message' => 'OTP resend failed',
+        'error' => __($otp['status'])
+    ], 422);
+    }
+    return response()->json(['message' => $otp['status']], 201);
+  } catch (\Exception $e) {
+    return response()->json(['message' => 'Resend OTP failed', 'error' => $e->getMessage()], 500);
+  }
+})->name('resendotp');
 
 #endregion
 
