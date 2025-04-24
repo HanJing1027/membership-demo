@@ -90,9 +90,9 @@ export const membershipApi = {
   },
 
   // 重送 OTP
-  resendOtp: async (email) => {
+  resendOtp: async (emailData) => {
     try {
-      const response = await api.post('/api/resend-otp', email)
+      const response = await api.post('/api/resendotp', emailData)
       return response.data
     } catch (error) {
       handleError(error)

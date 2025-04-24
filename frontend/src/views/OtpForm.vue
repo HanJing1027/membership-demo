@@ -29,7 +29,9 @@
 
     <div class="otp-resend-container">
       <p v-if="countdown > 0">重新發送驗證碼 ({{ countdown }}秒)</p>
-      <button v-else class="resend-btn" @click="handleResendOtpCode">重新發送驗證碼</button>
+      <button v-else class="resend-btn" @click="handleResendOtpCode" :disabled="isResending">
+        {{ isResending ? '重新發送中...' : '重新發送驗證碼' }}
+      </button>
     </div>
   </div>
 </template>
@@ -51,6 +53,7 @@ const countdown = ref(0)
 const timer = ref(null)
 const errorMessage = ref(null)
 const isSubmitting = ref(false)
+const isResending = ref(false)
 
 const regEmail = computed(() => {
   // 將 email 部分顯示改為 * (脫敏處理)
@@ -89,19 +92,33 @@ const handleSendOtpCode = async () => {
     router.replace({ name: 'RegisterSuccess' })
   } catch (error) {
     errorMessage.value = '驗證碼錯誤，請重新輸入'
+  } finally {
     isSubmitting.value = false
   }
 }
 
 const handleResendOtpCode = async () => {
-  await membershipApi.resendOtp({ email: email })
+  if (isResending.value) return
 
-  store.dispatch('toast/showToast', {
-    message: '驗證碼已重新發送',
-    type: 'success',
-  })
+  try {
+    isResending.value = true
 
-  startCountdown() // 重新倒數
+    await membershipApi.resendOtp({ email: email })
+
+    store.dispatch('toast/showToast', {
+      message: '驗證碼已重新發送',
+      type: 'success',
+    })
+
+    startCountdown() // 重新倒數
+  } catch (error) {
+    store.dispatch('toast/showToast', {
+      message: '驗證碼發送失敗，請稍後再試',
+      type: 'error',
+    })
+  } finally {
+    isResending.value = false
+  }
 }
 
 onMounted(() => {
@@ -226,7 +243,7 @@ onUnmounted(() => {
 
   transition: color 0.15s ease;
 
-  &:hover {
+  &:not(:disabled):hover {
     color: darken-color($primary-color, 10%);
   }
 }
