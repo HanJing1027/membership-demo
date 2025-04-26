@@ -111,7 +111,7 @@ const handleResetLink = debounce(handleResetLinkOriginal, 200)
 .description {
   text-align: center;
   margin-bottom: 2rem;
-  color: #666;
+  color: $text-color;
   font-size: 0.95rem;
   line-height: 1.5;
 }
@@ -152,7 +152,7 @@ const handleResetLink = debounce(handleResetLinkOriginal, 200)
     transform 0.1s;
 
   &:hover {
-    background-color: darken($primary-color, 5%);
+    background-color: darken-color($primary-color, 5%);
   }
 
   &:active {
@@ -160,7 +160,7 @@ const handleResetLink = debounce(handleResetLinkOriginal, 200)
   }
 
   &:disabled {
-    background-color: lighten($primary-color, 10%);
+    background-color: light-color($primary-color, 10%);
     cursor: not-allowed;
   }
 }
