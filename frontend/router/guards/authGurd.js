@@ -2,8 +2,8 @@ import store from '../../store/index.js'
 import Cookies from 'js-cookie'
 
 export function authGuard(to, from) {
+  const token = store.getters['auth/isAuthenticated']
   if (to.meta.requiresAuth) {
-    const token = store.getters['auth/isAuthenticated']
     if (!token) {
       return { name: 'Login', query: { redirect: to.fullPath } }
     }

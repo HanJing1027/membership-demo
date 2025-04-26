@@ -1,5 +1,5 @@
 <template>
-  <form class="register-form" @submit.prevent="handleSubmit">
+  <form class="register-form" novalidate @submit.prevent="handleSubmit">
     <BaseInput label="用戶名" type="text" id="username" v-model="form.username" />
 
     <BaseInput label="電子郵件" type="email" id="email" v-model="form.email" />
@@ -71,6 +71,11 @@ const form = ref({
   email: '',
   password: '',
   confirmPassword: '',
+})
+
+// mail 格式驗證
+const validateEmail = computed(() => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email)
 })
 
 // 密碼驗證檢查
@@ -167,6 +172,11 @@ const handleSubmit = () => {
   // 檢查所有必填的欄位
   if (!form.value.username || !form.value.email || !form.value.password) {
     emit('validation-error', new Error('請填寫所有欄位'))
+    return
+  }
+
+  if (!validateEmail.value) {
+    emit('validation-error', new Error('請輸入有效的電子郵件地址'))
     return
   }
 

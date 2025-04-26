@@ -27,9 +27,10 @@ api.interceptors.response.use(
   (error) => {
     if (error.response.status === 401) {
       const isOtpError = error.response.config.url.includes('/api/verify')
+      const isLoginError = error.response.config.url.includes('/api/login')
 
       // 確保所有錯誤都會通過Promise.reject(error)正確傳遞到調用的地方
-      if (!isOtpError) {
+      if (!isOtpError && !isLoginError) {
         store.dispatch('auth/forceLogout')
         router.replace('/')
       }
@@ -100,9 +101,21 @@ export const membershipApi = {
     }
   },
 
+  // 發送驗證 OTP 至註冊的 email
   verifyOtp: async (otpCode) => {
     try {
       const response = await api.post('/api/verify', otpCode)
+      return response.data
+    } catch (error) {
+      handleError(error)
+      throw error
+    }
+  },
+
+  // 忘記密碼
+  forgotPassword: async (emailData) => {
+    try {
+      const response = await api.post('/api/forgot-password', emailData)
       return response.data
     } catch (error) {
       handleError(error)

@@ -8,6 +8,18 @@
         @submit-form="handleFormSubmit"
         @validation-error="handleValidationError"
       />
+
+      <!-- 前往註冊 -->
+      <div class="form-footer">
+        還沒有帳號？ <router-link :to="{ name: 'Register' }">註冊新帳號</router-link>
+      </div>
+
+      <!-- 忘記密碼 -->
+      <div class="forgot-password-container">
+        <router-link :to="{ name: 'ForgotPassword' }" class="forgot-password-link"
+          >忘記密碼？</router-link
+        >
+      </div>
     </div>
   </div>
 </template>
@@ -15,17 +27,19 @@
 <script setup>
 import LoginForm from '@/components/features/LoginForm.vue'
 
+import { membershipApi } from '@/server/api/membershipApi.js'
+import { useDebounce } from '@/composable/useDebounce'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { membershipApi } from '@/server/api/membershipApi.js'
 
+const { debounce } = useDebounce()
 const router = useRouter()
 const store = useStore()
 
 const isSubmitting = ref(false)
 
-const handleValidationError = (error) => {
+const handleValidationErrorOriginal = (error) => {
   try {
     store.dispatch('toast/showToast', {
       show: true,
@@ -37,7 +51,7 @@ const handleValidationError = (error) => {
   }
 }
 
-const handleFormSubmit = async (formData) => {
+const handleFormSubmitOriginal = async (formData) => {
   try {
     isSubmitting.value = true
 
@@ -61,7 +75,6 @@ const handleFormSubmit = async (formData) => {
     })
   } catch (error) {
     store.dispatch('toast/showToast', {
-      show: true,
       type: 'error',
       message: '請檢查信箱/帳號或密碼是否正確',
     })
@@ -69,6 +82,9 @@ const handleFormSubmit = async (formData) => {
     isSubmitting.value = false
   }
 }
+
+const handleFormSubmit = debounce(handleFormSubmitOriginal, 500)
+const handleValidationError = debounce(handleValidationErrorOriginal, 200)
 </script>
 
 <style lang="scss" scoped>
@@ -100,6 +116,39 @@ const handleFormSubmit = async (formData) => {
   font-weight: 600;
 }
 
+.form-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+
+  a {
+    color: $primary-color;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.forgot-password-container {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.forgot-password-link {
+  color: $primary-color;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 @media (max-width: 767px) {
   .login-container {
     padding: 1rem;
@@ -124,6 +173,10 @@ const handleFormSubmit = async (formData) => {
   .login-form-wrapper {
     padding: 1.25rem 1rem;
     border-radius: 6px;
+  }
+
+  .form-footer {
+    margin-top: 1rem;
   }
 }
 </style>

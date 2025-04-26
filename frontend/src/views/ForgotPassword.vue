@@ -24,9 +24,12 @@
 
 <script setup>
 import BaseInput from '@/components/common/BaseInput.vue'
+import { useDebounce } from '@/composable/useDebounce'
+import { membershipApi } from '@/server/api/membershipApi'
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
 
+const { debounce } = useDebounce()
 const store = useStore()
 const email = ref('')
 
@@ -34,7 +37,7 @@ const validateEmail = computed(() => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)
 })
 
-const handleResetLink = async () => {
+const handleResetLinkOriginal = async () => {
   try {
     // throw error('This is a test error')
 
@@ -45,6 +48,9 @@ const handleResetLink = async () => {
       })
       return
     }
+
+    // api 請求
+    await membershipApi.forgotPassword(validateEmail.value)
 
     store.dispatch('toast/showToast', {
       message: '重設連結已發送至您的電子郵件!',
@@ -59,6 +65,8 @@ const handleResetLink = async () => {
     })
   }
 }
+
+const handleResetLink = debounce(handleResetLinkOriginal, 500)
 </script>
 
 <style lang="scss" scoped>

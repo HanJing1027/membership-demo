@@ -37,4 +37,13 @@ export default [
       RegistrationProcessRequired: true, // 需要註冊流程
     },
   },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: () => import('@/views/ForgotPassword.vue'),
+    meta: {
+      title: '忘記密碼',
+      guestOnly: true,
+    },
+  },
 ]
