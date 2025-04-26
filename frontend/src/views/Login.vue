@@ -1,5 +1,5 @@
 <template>
-  <div class="login-container">
+  <main class="login-container">
     <div class="login-form-wrapper">
       <h1 class="login-title">登入帳號</h1>
 
@@ -21,7 +21,7 @@
         >
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup>

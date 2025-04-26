@@ -1,5 +1,5 @@
 <template>
-  <div class="forgot-password-container">
+  <main class="forgot-password-container">
     <div class="forgot-password-form">
       <h1 class="title">忘記密碼</h1>
 
@@ -15,11 +15,13 @@
         />
 
         <div class="form-actions">
-          <button type="submit" class="submit-button">發送重設連結</button>
+          <button type="submit" class="submit-button" :disabled="isSubmitting">
+            {{ isSubmitting ? '發送信件中...' : '發送重設連結' }}
+          </button>
         </div>
       </form>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup>
@@ -27,11 +29,14 @@ import BaseInput from '@/components/common/BaseInput.vue'
 import { useDebounce } from '@/composable/useDebounce'
 import { membershipApi } from '@/server/api/membershipApi'
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 
 const { debounce } = useDebounce()
 const store = useStore()
+const router = useRouter()
 const email = ref('')
+const isSubmitting = ref(false)
 
 const validateEmail = computed(() => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)
@@ -39,6 +44,7 @@ const validateEmail = computed(() => {
 
 const handleResetLinkOriginal = async () => {
   try {
+    isSubmitting.value = true
     // throw error('This is a test error')
 
     if (!validateEmail.value) {
@@ -57,16 +63,20 @@ const handleResetLinkOriginal = async () => {
       type: 'success',
     })
 
-    console.log(email.value)
+    router.replace({
+      name: 'CheckEmail',
+    })
   } catch (error) {
     store.dispatch('toast/showToast', {
       message: '發送失敗，稍後再試!',
       type: 'error',
     })
+  } finally {
+    isSubmitting.value = false
   }
 }
 
-const handleResetLink = debounce(handleResetLinkOriginal, 500)
+const handleResetLink = debounce(handleResetLinkOriginal, 200)
 </script>
 
 <style lang="scss" scoped>
@@ -147,6 +157,11 @@ const handleResetLink = debounce(handleResetLinkOriginal, 500)
 
   &:active {
     transform: translateY(1px);
+  }
+
+  &:disabled {
+    background-color: lighten($primary-color, 10%);
+    cursor: not-allowed;
   }
 }
 

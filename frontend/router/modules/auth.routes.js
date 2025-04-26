@@ -46,4 +46,23 @@ export default [
       guestOnly: true,
     },
   },
+  {
+    path: '/check-email',
+    name: 'CheckEmail',
+    component: () => import('@/views/CheckEmail.vue'),
+    meta: {
+      title: '檢查電子郵件',
+      guestOnly: true,
+      forgotPasswordProcessRequired: true, // 需要忘記密碼流程
+    },
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: () => import('@/views/ResetPassword.vue'),
+    meta: {
+      title: '重設密碼',
+      guestOnly: true,
+    },
+  },
 ]

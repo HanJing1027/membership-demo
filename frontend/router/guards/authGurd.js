@@ -30,4 +30,12 @@ export function authGuard(to, from) {
       return { name: 'Register' }
     }
   }
+
+  if (to.meta.forgotPasswordProcessRequired) {
+    const isCheckEmailPage = from.name === 'CheckEmail'
+
+    if (!isCheckEmailPage) {
+      return { name: 'Home' }
+    }
+  }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="register-container">
+  <main class="register-container">
     <div class="register-form-wrapper">
       <h1 class="register-title">註冊帳號</h1>
 
@@ -9,7 +9,7 @@
         @validation-error="handleValidationError"
       />
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup>

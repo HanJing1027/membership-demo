@@ -106,7 +106,7 @@ const goToHome = () => {
 
   .login-button {
     background-color: $primary-color;
-    color: white;
+    color: $light-color;
     border: none;
     border-radius: 8px;
     padding: 0.8rem 2.5rem;
@@ -119,7 +119,6 @@ const goToHome = () => {
     transform-origin: center;
     pointer-events: none;
 
-    // 添加點擊反饋
     &:active {
       transform: scale(0.98);
     }

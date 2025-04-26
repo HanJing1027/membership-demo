@@ -1,5 +1,5 @@
 <template>
-  <div class="otp-container">
+  <main class="otp-container">
     <h1 class="otp-title">驗證您的帳號</h1>
 
     <div class="otp-message">
@@ -33,7 +33,7 @@
         {{ isResending ? '重新發送中...' : '重新發送驗證碼' }}
       </button>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup>
