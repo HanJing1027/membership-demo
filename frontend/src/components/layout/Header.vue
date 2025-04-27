@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 
@@ -85,6 +85,13 @@ const logout = async () => {
     message: '登出成功！',
   })
 }
+
+watch(
+  () => route.fullPath,
+  () => {
+    isMobileMenuOpen.value = false
+  }
+)
 </script>
 
 <style lang="scss" scoped>
