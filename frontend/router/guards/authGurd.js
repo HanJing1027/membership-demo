@@ -40,6 +40,6 @@ export function authGuard(to, from) {
   }
 
   if (to.meta.resetPasswordProcessRequired && !sessionStorage.getItem('resetPasswordToken')) {
-    return { name: 'forgotPassword' }
+    return { name: 'ForgotPassword' }
   }
 }
