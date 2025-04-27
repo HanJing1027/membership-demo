@@ -63,6 +63,7 @@ export default [
     meta: {
       title: '重設密碼',
       guestOnly: true,
+      resetPasswordProcessRequired: true, // 需要 query 中的 token
     },
   },
 ]

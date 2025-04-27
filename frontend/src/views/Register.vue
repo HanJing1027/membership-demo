@@ -14,7 +14,6 @@
 
 <script setup>
 import RegisterForm from '@/components/features/RegisterForm.vue'
-import Cookies from 'js-cookie'
 
 import { membershipApi } from '@/server/api/membershipApi.js'
 import { useDebounce } from '@/composable/useDebounce'
@@ -43,10 +42,9 @@ const handleFormSubmitOriginal = async (formData) => {
   try {
     isSubmitting.value = true
 
+    // 將 email 存入 sessionStorage
     const { email } = formData
-    Cookies.set('otpEmail', email, {
-      sameSite: 'Strict', // 嚴格模式防止 CSRF 攻擊
-    })
+    sessionStorage.setItem('registerEmail', email)
 
     //  API 請求
     await membershipApi.register(formData)

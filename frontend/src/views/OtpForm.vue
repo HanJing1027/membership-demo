@@ -38,16 +38,17 @@
 
 <script setup>
 import OtpInput from '@/components/common/OtpInput.vue'
-import Cookies from 'js-cookie'
 
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { membershipApi } from '@/server/api/membershipApi'
+import { useDebounce } from '@/composable/useDebounce'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 
+const { debounce } = useDebounce()
 const router = useRouter()
 const store = useStore()
-const email = Cookies.get('otpEmail')
+const email = sessionStorage.getItem('registerEmail')
 const otpCode = ref('')
 const countdown = ref(0)
 const timer = ref(null)
@@ -63,7 +64,7 @@ const regEmail = computed(() => {
 })
 
 const startCountdown = () => {
-  countdown.value = 60 // 60秒倒數
+  countdown.value = 2 // 60秒倒數
 
   // 設置計時器
   timer.value = setInterval(() => {
@@ -79,7 +80,7 @@ const isValidOtpCode = computed(() => {
   return otpCode.value.length === 6
 })
 
-const handleSendOtpCode = async () => {
+const handleSendOtpCodeOriginal = async () => {
   try {
     if (!isValidOtpCode.value) return
 
@@ -87,6 +88,9 @@ const handleSendOtpCode = async () => {
 
     // api請求
     await membershipApi.verifyOtp({ otp: otpCode.value, email: email })
+
+    // 驗證成功後，清除暫存的信箱
+    sessionStorage.removeItem('registerEmail')
 
     // 成功後跳轉頁面
     router.replace({ name: 'RegisterSuccess' })
@@ -97,7 +101,7 @@ const handleSendOtpCode = async () => {
   }
 }
 
-const handleResendOtpCode = async () => {
+const handleResendOtpCodeOriginal = async () => {
   if (isResending.value) return
 
   try {
@@ -109,17 +113,19 @@ const handleResendOtpCode = async () => {
       message: '驗證碼已重新發送',
       type: 'success',
     })
-
-    startCountdown() // 重新倒數
   } catch (error) {
     store.dispatch('toast/showToast', {
       message: '驗證碼發送失敗，請稍後再試',
       type: 'error',
     })
   } finally {
+    startCountdown() // 重新倒數
     isResending.value = false
   }
 }
+
+const handleSendOtpCode = debounce(handleSendOtpCodeOriginal, 200)
+const handleResendOtpCode = debounce(handleResendOtpCodeOriginal, 200)
 
 onMounted(() => {
   startCountdown()
@@ -127,9 +133,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearInterval(timer.value)
-
-  // 離開頁面時清除 Cookies 中的信箱
-  Cookies.remove('otpEmail')
 })
 </script>
 

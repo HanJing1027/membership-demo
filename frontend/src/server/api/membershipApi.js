@@ -32,11 +32,9 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response.status === 401) {
-      const isOtpError = error.response.config.url.includes('/api/verify')
-      const isLoginError = error.response.config.url.includes('/api/login')
+      const isRefreshToken = error.response.config.url.includes('/api/refresh')
 
-      // 確保所有錯誤都會通過Promise.reject(error)正確傳遞到調用的地方
-      if (!isOtpError && !isLoginError) {
+      if (isRefreshToken) {
         store.dispatch('auth/forceLogout')
         router.replace('/')
       }
@@ -122,6 +120,17 @@ export const membershipApi = {
   forgotPassword: async (emailData) => {
     try {
       const response = await api.post('/api/forgot-password', emailData)
+      return response.data
+    } catch (error) {
+      handleError(error)
+      throw error
+    }
+  },
+
+  // 重設密碼
+  resetPassword: async (resetData) => {
+    try {
+      const response = await api.post('/api/reset-password', resetData)
       return response.data
     } catch (error) {
       handleError(error)

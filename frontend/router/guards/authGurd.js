@@ -18,7 +18,7 @@ export function authGuard(to, from) {
   }
 
   // otp 流程守衛
-  if (to.meta.otpOnly && !Cookies.get('otpEmail')) {
+  if (to.meta.otpOnly && !sessionStorage.getItem('registerEmail')) {
     return { name: 'Register' }
   }
 
@@ -37,5 +37,9 @@ export function authGuard(to, from) {
     if (!isCheckEmailPage) {
       return { name: 'Home' }
     }
+  }
+
+  if (to.meta.resetPasswordProcessRequired && !sessionStorage.getItem('resetPasswordToken')) {
+    return { name: 'forgotPassword' }
   }
 }
