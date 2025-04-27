@@ -18,6 +18,7 @@
           <button type="submit" class="submit-button" :disabled="isSubmitting">
             {{ isSubmitting ? '發送信件中...' : '發送重設連結' }}
           </button>
+          <p class="error-message" v-if="isUnknownEamil">此信箱尚未註冊</p>
         </div>
       </form>
     </div>
@@ -37,6 +38,7 @@ const store = useStore()
 const router = useRouter()
 const email = ref('')
 const isSubmitting = ref(false)
+const isUnknownEamil = ref(false)
 
 const validateEmail = computed(() => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)
@@ -67,6 +69,12 @@ const handleResetLinkOriginal = async () => {
       name: 'CheckEmail',
     })
   } catch (error) {
+    // 狀態碼檢查 404
+    if (error.response.status === 404) {
+      isUnknownEamil.value = true
+      return
+    }
+
     store.dispatch('toast/showToast', {
       message: '發送失敗，稍後再試!',
       type: 'error',
@@ -131,6 +139,7 @@ const handleResetLink = debounce(handleResetLinkOriginal, 200)
 
 .error-message {
   color: #e74c3c;
+  text-align: center;
   font-size: 0.85rem;
   margin-top: 0.5rem;
   margin-bottom: 0;
