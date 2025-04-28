@@ -25,6 +25,16 @@ const store = useStore()
 const props = defineProps({
   modal: {
     type: Object,
+    required: true,
+    default: () => ({
+      show: false,
+      title: '',
+      content: '',
+      boxIcon: '',
+      buttonText: '',
+      buttonAction: null,
+      buttonCallback: null,
+    }),
   },
 })
 

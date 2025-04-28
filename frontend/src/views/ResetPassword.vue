@@ -124,15 +124,28 @@ const handleResetPasswordOriginal = async () => {
       router.replace({
         name: 'Login',
       })
-      sessionStorage.removeItem('resetPasswordToken')
-
       store.dispatch('modal/hideModal')
     }, 5000)
   } catch (error) {
     // 處理錯誤
-    // 跳出彈跳視窗，重新申請重設密碼文字 & 重新申請重設密碼按鈕 < ========== coding
+    store.dispatch('modal/showModal', {
+      title: '驗證連結已過期',
+      content: '連結已過期，請重新申請重設密碼',
+      buttonText: '重新申請',
+      boxIcon: 'bx-x',
+      buttonAction: 'close',
+      buttonCallback: () => {
+        router.replace({
+          name: 'ForgotPassword',
+        })
+      },
+    })
   } finally {
     isSubmitting.value = false
+
+    setTimeout(() => {
+      sessionStorage.removeItem('resetPasswordToken')
+    }, 5000)
   }
 }
 
