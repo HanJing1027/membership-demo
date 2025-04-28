@@ -39,7 +39,13 @@ export function authGuard(to, from) {
     }
   }
 
-  if (to.meta.resetPasswordProcessRequired && !sessionStorage.getItem('resetPasswordToken')) {
-    return { name: 'ForgotPassword' }
+  if (to.meta.resetPasswordProcessRequired) {
+    if (to.query.token) {
+      sessionStorage.setItem('resetPasswordToken', to.query.token)
+    }
+
+    if (!sessionStorage.getItem('resetPasswordToken')) {
+      return { name: 'ForgotPassword' }
+    }
   }
 }
