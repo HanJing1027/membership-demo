@@ -47,14 +47,12 @@
 import BaseInput from '@/components/common/BaseInput.vue'
 import PasswordStrengthChecker from '@/components/common/PasswordStrengthChecker.vue'
 import { membershipApi } from '@/server/api/membershipApi'
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import { useDebounce } from '@/composable/useDebounce'
 
 const router = useRouter()
-const route = useRoute()
 const store = useStore()
 
 const { debounce } = useDebounce()
@@ -63,8 +61,6 @@ const confirmPassword = ref('')
 const passwordChecks = ref({})
 const passwordValid = ref(false)
 const isSubmitting = ref(false)
-
-sessionStorage.setItem('resetPasswordToken', route.query.token)
 
 // 兩次密碼驗證
 const isPasswordMatched = computed(() => {
@@ -111,21 +107,30 @@ const handleResetPasswordOriginal = async () => {
       newPassword: newPassword.value,
     })
 
-    store.dispatch('toast/showToast', {
-      message: '重設成功，5秒後將自動跳轉至登入頁面',
-      type: 'success',
+    store.dispatch('modal/showModal', {
+      title: '重設成功',
+      content: '密碼已重設成功，5秒後將自動跳轉至登入頁面',
+      buttonText: '前往登入',
+      boxIcon: 'bx-check',
+      buttonAction: 'close',
+      buttonCallback: () => {
+        router.replace({
+          name: 'Login',
+        })
+      },
     })
 
     setTimeout(() => {
       router.replace({
         name: 'Login',
       })
-
       sessionStorage.removeItem('resetPasswordToken')
+
+      store.dispatch('modal/hideModal')
     }, 5000)
   } catch (error) {
     // 處理錯誤
-    // 跳出彈跳視窗，重新申請重設密碼文字 & 重新申請重設密碼按鈕
+    // 跳出彈跳視窗，重新申請重設密碼文字 & 重新申請重設密碼按鈕 < ========== coding
   } finally {
     isSubmitting.value = false
   }

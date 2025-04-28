@@ -26,8 +26,8 @@ export default {
     showToast(context, { type, message }) {
       context.commit('SET_TOAST', {
         show: true,
-        type: type,
-        message: message,
+        type,
+        message,
       })
 
       setTimeout(() => {
