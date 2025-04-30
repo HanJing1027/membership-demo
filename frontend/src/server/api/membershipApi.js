@@ -4,15 +4,15 @@ import store from '../../../store/index.js'
 import router from '../../../router/index.js'
 
 const api = axios.create()
-const TOKEN_KEY = 'auth_token' // 需要和 vuex auth.js 中使用的常數一致
+const TOKEN_KEY = 'auth_token' // Cookie 名稱，用於存儲 JWT token，需與 auth.js 保持一致以確保系統各部分能正確存取相同的認證信息
 
 // 登入、註冊不需要攜帶 JWT
 const EXCLUDED_URLS = [
+  '/api/login',
   '/api/register',
+  '/api/forgot-password',
   '/api/verify',
   '/api/resendotp',
-  '/api/login',
-  '/api/forgot-password',
 ]
 
 api.interceptors.request.use((config) => {
@@ -99,10 +99,21 @@ export const membershipApi = {
   refreshToken: async () => {
     try {
       const response = await api.post('/api/refresh')
+      const newToken = response.data.authorization.token
+
+      // 刷新成功後立即更新 Cookie
+      Cookies.set(TOKEN_KEY, newToken, {
+        // secure: true, 開發用不到，部署到 HTTPS 再開啟
+        sameSite: 'Strict', // 嚴格模式防止 CSRF 攻擊
+      })
+
+      // 立即更新 axios 的請求頭
+      api.defaults.headers['Authorization'] = `Bearer ${newToken}`
+
       return response.data
     } catch (error) {
-      // handleError(error)
-      // throw error
+      handleError(error)
+      throw error
     }
   },
 
@@ -137,4 +148,28 @@ export const membershipApi = {
       throw error
     }
   },
+
+  // 獲取使用者資料
+  getUserData: async () => {
+    try {
+      const response = await api.get('/api/userData')
+      return response.data
+    } catch (error) {
+      handleError(error)
+      throw error
+    }
+  },
+
+  // 修改使用者資料
+  editingUserData: async (userData) => {
+    try {
+      const response = await api.post('/api/editUserData')
+      return response.data
+    } catch (error) {
+      handleError(error)
+      throw error
+    }
+  },
+
+  // 修改用戶頭像
 }

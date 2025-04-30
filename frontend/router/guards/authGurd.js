@@ -1,5 +1,4 @@
 import store from '../../store/index.js'
-import Cookies from 'js-cookie'
 
 export function authGuard(to, from) {
   const token = store.getters['auth/isAuthenticated']

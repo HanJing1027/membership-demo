@@ -53,24 +53,21 @@ export default {
       const token = Cookies.get(TOKEN_KEY)
       const username = Cookies.get(USER_KEY)
 
+      if (!token) {
+        context.commit('REMOVE_AUTH')
+        return
+      }
+
       context.commit('SET_TOKEN', token)
       context.commit('SET_USER', username)
 
       // refresh token
       try {
-        if (!token) return
-
         const response = await membershipApi.refreshToken()
         const newToken = response.authorization.token
 
         // 使用新的 token 更新狀態
         context.commit('SET_TOKEN', newToken)
-
-        // 更新 cookie 新 token
-        Cookies.set(TOKEN_KEY, newToken, {
-          // secure: true, 開發用不到，部署到 HTTPS 再開啟
-          sameSite: 'Strict', // 嚴格模式防止 CSRF 攻擊
-        })
       } catch (error) {
         // console.error('刷新 token 失敗:', error)
       }

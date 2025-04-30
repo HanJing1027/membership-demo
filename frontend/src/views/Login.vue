@@ -42,7 +42,6 @@ const isSubmitting = ref(false)
 const handleValidationErrorOriginal = (error) => {
   try {
     store.dispatch('toast/showToast', {
-      show: true,
       type: 'error',
       message: error.message,
     })
@@ -69,7 +68,6 @@ const handleFormSubmitOriginal = async (formData) => {
 
     // 顯示登入成功的提示
     store.dispatch('toast/showToast', {
-      show: true,
       type: 'success',
       message: '登入成功！',
     })
