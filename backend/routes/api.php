@@ -6,7 +6,13 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use SadiqSalau\LaravelOtp\Facades\Otp;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use App\Otp\mailotp;
+use App\Mail\resetPwMail;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,9 +26,9 @@ use App\Otp\mailotp;
 */
 
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-  return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//   return $request->user();
+// });
 
 #region 註冊
 Route::post('/register', function (Request $request) {
@@ -30,7 +36,7 @@ Route::post('/register', function (Request $request) {
 
     $request->validate([
       'username' => 'required|string|max:255',
-      'email' => 'required|string|email|max:255|unique:users',
+      'email' => 'required|string|email|unique:users',
       'password' => 'required|string',
     ]);
 
@@ -79,7 +85,8 @@ Route::post('resendotp', function (Request $request) {
 
     $otp = Otp::identifier($request->email)->update();
     if($otp['status'] != Otp::OTP_SENT)
-    {
+    {      
+      Log::debug('OTP resend attempt', ['email' => $request->email, 'status' => $otp['status']]);
       return response()->json([
         'message' => 'OTP resend failed',
         'error' => __($otp['status'])
@@ -152,23 +159,21 @@ Route::post('/refresh', function (Request $request) {
 })->name('refresh');
 #endregion
 
-#region 受保護的資料路由
-Route::middleware('auth:api')->get('/protected-data', function (Request $request) {
+#region 用戶私人資料
+Route::middleware('auth:api')->get('/userData', function (Request $request) {
   try {
     // 獲取當前認證用戶
     $user = Auth::guard('api')->user();
-
+    if (!$user) {
+      return response()->json(['message' => 'Unauthorized'], 401);
+    }
     // 返回受保護的資料和用戶信息
     return response()->json([
-      'message' => '成功獲取受保護資料',
-      'user_info' => [
-        'id' => $user->id,
+      'userInfo' => [
         'username' => $user->username,
+        'userAvatar' => null,
         'email' => $user->email,
-      ],
-      'data' => [
-        'sensitive_info' => '這是僅限授權用戶查看的敏感資訊',
-        'timestamp' => now()->toDateTimeString(),
+        'createdAt' => $user->created_at
       ]
     ]);
   } catch (\Exception $e) {
@@ -176,3 +181,104 @@ Route::middleware('auth:api')->get('/protected-data', function (Request $request
   }
 })->name('protected-data');
 #endregion
+
+#region 用戶修改密碼
+Route::middleware('auth:api')->post('/updatepassword', function (Request $request) {
+  try {
+
+    // 獲取當前認證用戶
+    $user = Auth::guard('api')->user();
+
+    $request->validate([
+      'oldPassword' => 'required|string',
+      'newPassword' => 'required|string',
+    ]);
+    
+    if (!Hash::check($request->oldPassword, $user->password)) {
+      return response()->json(['message' => 'Old password is incorrect'], 401);
+    }
+    $user->password = Hash::make($request->newPassword);
+    $user->save();
+    
+    return response()->json(['message' => 'Password updated successfully'], 200);
+  } catch (\Exception $e) {
+    return response()->json(['message' => 'Password update failed', 'error' => $e->getMessage()], 500);
+  }
+})->name('updatepassword');
+#endregion
+/*
+#region 密碼重設
+Route::post('/forgotPassword', function (Request $request) {
+  try {
+    $request->validate([
+      'email' => 'required|string|email',
+    ]);
+
+    $user = User::where('email', $request->email)->first();
+    if (!$user) {
+      return response()->json(['message' => 'User not found'], 404);
+    }
+
+    // 生成重設密碼 token
+    $token = Str::random(60);
+    
+    // 儲存 token 到資料庫
+    DB::table('password_reset_tokens')->updateOrInsert(
+      ['email' => $request->email],
+      [
+        'token' => Hash::make($token),
+        'created_at' => now()
+      ]
+    );
+
+    // 發送重設密碼郵件
+    Mail::to($request->email)->send(new resetPwMail($token, $request->email));
+
+    return response()->json(['message' => '重設密碼郵件已發送'], 200);
+  } catch (\Exception $e) {
+    return response()->json(['message' => '重設密碼郵件發送失敗', 'error' => $e->getMessage()], 500);
+  }
+})->name('forgotPassword');
+
+Route::post('/resetPassword', function (Request $request) {
+  try {
+    $request->validate([
+      'token' => 'required|string',
+      'email' => 'required|string|email',
+      'password' => 'required|string|min:6',
+    ]);
+
+    $resetRecord = DB::table('password_reset_tokens')
+      ->where('email', $request->email)
+      ->first();
+
+    if (!$resetRecord) {
+      return response()->json(['message' => '無效的重設請求'], 400);
+    }
+
+    if (!Hash::check($request->token, $resetRecord->token)) {
+      return response()->json(['message' => '無效的重設token'], 400);
+    }
+
+    // 檢查token是否過期（60分鐘）
+    if (now()->diffInMinutes($resetRecord->created_at) > 60) {
+      return response()->json(['message' => '重設連結已過期'], 400);
+    }
+
+    // 更新密碼
+    $user = User::where('email', $request->email)->first();
+    $user->password = Hash::make($request->password);
+    $user->save();
+
+    // 刪除重設記錄
+    DB::table('password_reset_tokens')
+      ->where('email', $request->email)
+      ->delete();
+
+    return response()->json(['message' => '密碼重設成功'], 200);
+  } catch (\Exception $e) {
+    return response()->json(['message' => '密碼重設失敗', 'error' => $e->getMessage()], 500);
+  }
+})->name('resetPassword');
+#endregion
+*/
