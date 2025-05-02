@@ -52,7 +52,8 @@ class resetPwMail extends Mailable
         return new Content(
             view: 'emails.reset-password',
             with: [
-                'resetUrl' => $resetUrl
+                'resetUrl' => $resetUrl,
+                'expireMinutes' => env('PASSWORD_RESET_TOKEN_EXPIRE')
             ]
         );
     }
