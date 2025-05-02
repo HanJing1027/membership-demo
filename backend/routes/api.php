@@ -179,7 +179,7 @@ Route::middleware('auth:api')->get('/userData', function (Request $request) {
   } catch (\Exception $e) {
     return response()->json(['message' => '獲取資料失敗', 'error' => $e->getMessage()], 500);
   }
-})->name('protected-data');
+})->name('userData');
 #endregion
 
 #region 用戶修改密碼
@@ -206,7 +206,7 @@ Route::middleware('auth:api')->post('/updatepassword', function (Request $reques
   }
 })->name('updatepassword');
 #endregion
-/*
+
 #region 密碼重設
 Route::post('/forgotPassword', function (Request $request) {
   try {
@@ -216,27 +216,26 @@ Route::post('/forgotPassword', function (Request $request) {
 
     $user = User::where('email', $request->email)->first();
     if (!$user) {
-      return response()->json(['message' => 'User not found'], 404);
+      return response()->json(['message' => 'email not found'], 404);
     }
 
     // 生成重設密碼 token
-    $token = Str::random(60);
+    $token = Str::random(30);
+    error_log($token);
     
-    // 儲存 token 到資料庫
-    DB::table('password_reset_tokens')->updateOrInsert(
-      ['email' => $request->email],
-      [
-        'token' => Hash::make($token),
-        'created_at' => now()
-      ]
-    );
 
-    // 發送重設密碼郵件
+    //發送重設密碼郵件
     Mail::to($request->email)->send(new resetPwMail($token, $request->email));
+    // 儲存token到資料庫
+    DB::table('password_reset_tokens')->insert([
+      'email' => $request->email,
+      'token' => $token,
+      'created_at' => now()
+    ]);
 
-    return response()->json(['message' => '重設密碼郵件已發送'], 200);
+    return response()->json(['message' => 'mail send'], 200);
   } catch (\Exception $e) {
-    return response()->json(['message' => '重設密碼郵件發送失敗', 'error' => $e->getMessage()], 500);
+    return response()->json(['message' => 'send mail error', 'error' => $e->getMessage()], 500);
   }
 })->name('forgotPassword');
 
@@ -244,41 +243,32 @@ Route::post('/resetPassword', function (Request $request) {
   try {
     $request->validate([
       'token' => 'required|string',
-      'email' => 'required|string|email',
-      'password' => 'required|string|min:6',
+      'password' => 'required|string'
     ]);
 
-    $resetRecord = DB::table('password_reset_tokens')
-      ->where('email', $request->email)
-      ->first();
+    $resetRecord = DB::table('password_reset_tokens')->where('token', $request->token)->first();
+    $email = $resetRecord->email ?? null;
 
     if (!$resetRecord) {
-      return response()->json(['message' => '無效的重設請求'], 400);
+      return response()->json(['message' => 'token not found'], 401);
     }
 
-    if (!Hash::check($request->token, $resetRecord->token)) {
-      return response()->json(['message' => '無效的重設token'], 400);
-    }
-
-    // 檢查token是否過期（60分鐘）
-    if (now()->diffInMinutes($resetRecord->created_at) > 60) {
-      return response()->json(['message' => '重設連結已過期'], 400);
+    // 檢查token是否過期
+    if (now()->diffInMinutes($resetRecord->created_at) > env('PASSWORD_RESET_TOKEN_EXPIRE')) {
+      return response()->json(['message' => 'token is died'], 401);
     }
 
     // 更新密碼
-    $user = User::where('email', $request->email)->first();
+    $user = User::where('email', $email)->first();
     $user->password = Hash::make($request->password);
     $user->save();
 
     // 刪除重設記錄
-    DB::table('password_reset_tokens')
-      ->where('email', $request->email)
-      ->delete();
+    DB::table('password_reset_tokens')->where('token', $request->token)->delete();
 
-    return response()->json(['message' => '密碼重設成功'], 200);
+    return response()->json(['message' => 'password reset success'], 200);
   } catch (\Exception $e) {
-    return response()->json(['message' => '密碼重設失敗', 'error' => $e->getMessage()], 500);
+    return response()->json(['message' => 'password reset failed', 'error' => $e->getMessage()], 500);
   }
 })->name('resetPassword');
 #endregion
-*/
