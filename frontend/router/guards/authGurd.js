@@ -31,9 +31,9 @@ export function authGuard(to, from) {
   }
 
   if (to.meta.forgotPasswordProcessRequired) {
-    const isCheckEmailPage = from.name === 'CheckEmail'
+    const isForgotPasswordPage = from.name === 'ForgotPassword'
 
-    if (!isCheckEmailPage) {
+    if (!isForgotPasswordPage) {
       return { name: 'Home' }
     }
   }

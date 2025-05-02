@@ -47,7 +47,6 @@ const validateEmail = computed(() => {
 const handleResetLinkOriginal = async () => {
   try {
     isSubmitting.value = true
-    // throw error('This is a test error')
 
     if (!validateEmail.value) {
       store.dispatch('toast/showToast', {
@@ -58,7 +57,7 @@ const handleResetLinkOriginal = async () => {
     }
 
     // api 請求
-    await membershipApi.forgotPassword(validateEmail.value)
+    await membershipApi.forgotPassword({ email: email.value })
 
     store.dispatch('toast/showToast', {
       message: '重設連結已發送至您的電子郵件!',

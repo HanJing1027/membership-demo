@@ -130,7 +130,7 @@ export const membershipApi = {
   // 忘記密碼 (發送重設密碼的 email)
   forgotPassword: async (emailData) => {
     try {
-      const response = await api.post('/api/forgot-password', emailData)
+      const response = await api.post('/api/forgotPassword', emailData)
       return response.data
     } catch (error) {
       handleError(error)
@@ -141,7 +141,7 @@ export const membershipApi = {
   // 重設密碼
   resetPassword: async (resetData) => {
     try {
-      const response = await api.post('/api/reset-password', resetData)
+      const response = await api.post('/api/resetPassword', resetData)
       return response.data
     } catch (error) {
       handleError(error)
@@ -172,4 +172,15 @@ export const membershipApi = {
   },
 
   // 修改用戶頭像
+  uploadAvatar: async (formData) => {
+    try {
+      const response = await api.post('/api/uploadAvatar', formData, {
+        transformRequest: null,
+      })
+      return response.data
+    } catch (error) {
+      handleError(error)
+      throw error
+    }
+  },
 }
