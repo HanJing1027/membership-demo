@@ -243,7 +243,7 @@ Route::post('/resetPassword', function (Request $request) {
   try {
     $request->validate([
       'token' => 'required|string',
-      'password' => 'required|string'
+      'newPassword' => 'required|string'
     ]);
 
     $resetRecord = DB::table('password_reset_tokens')->where('token', $request->token)->first();
@@ -260,11 +260,11 @@ Route::post('/resetPassword', function (Request $request) {
 
     // 更新密碼
     $user = User::where('email', $email)->first();
-    $user->password = Hash::make($request->password);
+    $user->password = Hash::make($request->newPassword);
     $user->save();
 
     // 刪除重設記錄
-    DB::table('password_reset_tokens')->where('token', $request->token)->delete();
+    DB::table('password_reset_tokens')->where('email', $email)->delete();
 
     return response()->json(['message' => 'password reset success'], 200);
   } catch (\Exception $e) {
