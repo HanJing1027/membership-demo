@@ -59,7 +59,7 @@ const props = defineProps({
     }
 
     span {
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       letter-spacing: 3px;
     }
   }

@@ -1,5 +1,5 @@
 <template>
-  <div class="otp-container">
+  <main class="otp-container">
     <h1 class="otp-title">驗證您的帳號</h1>
 
     <div class="otp-message">
@@ -29,28 +29,32 @@
 
     <div class="otp-resend-container">
       <p v-if="countdown > 0">重新發送驗證碼 ({{ countdown }}秒)</p>
-      <button v-else class="resend-btn" @click="handleResendOtpCode">重新發送驗證碼</button>
+      <button v-else class="resend-btn" @click="handleResendOtpCode" :disabled="isResending">
+        {{ isResending ? '重新發送中...' : '重新發送驗證碼' }}
+      </button>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup>
 import OtpInput from '@/components/common/OtpInput.vue'
-import Cookies from 'js-cookie'
 
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { membershipApi } from '@/server/api/membershipApi'
+import { useDebounce } from '@/composable/useDebounce'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 
+const { debounce } = useDebounce()
 const router = useRouter()
 const store = useStore()
-const email = Cookies.get('otpEmail')
+const email = sessionStorage.getItem('registerEmail')
 const otpCode = ref('')
 const countdown = ref(0)
 const timer = ref(null)
 const errorMessage = ref(null)
 const isSubmitting = ref(false)
+const isResending = ref(false)
 
 const regEmail = computed(() => {
   // 將 email 部分顯示改為 * (脫敏處理)
@@ -60,7 +64,7 @@ const regEmail = computed(() => {
 })
 
 const startCountdown = () => {
-  countdown.value = 60 // 60秒倒數
+  countdown.value = 2 // 60秒倒數
 
   // 設置計時器
   timer.value = setInterval(() => {
@@ -76,14 +80,17 @@ const isValidOtpCode = computed(() => {
   return otpCode.value.length === 6
 })
 
-const handleSendOtpCode = async () => {
+const handleSendOtpCodeOriginal = async () => {
   try {
     if (!isValidOtpCode.value) return
 
     isSubmitting.value = true
 
     // api請求
-    await membershipApi.sendOtp({ otpCode: otpCode.value })
+    await membershipApi.verifyOtp({ otp: otpCode.value, email: email })
+
+    // 驗證成功後，清除暫存的信箱
+    sessionStorage.removeItem('registerEmail')
 
     // 成功後跳轉頁面
     router.replace({ name: 'RegisterSuccess' })
@@ -94,16 +101,31 @@ const handleSendOtpCode = async () => {
   }
 }
 
-const handleResendOtpCode = async () => {
-  await membershipApi.resendOtp({ email: email })
+const handleResendOtpCodeOriginal = async () => {
+  if (isResending.value) return
 
-  store.dispatch('toast/showToast', {
-    message: '驗證碼已重新發送',
-    type: 'success',
-  })
+  try {
+    isResending.value = true
 
-  startCountdown() // 重新倒數
+    await membershipApi.resendOtp({ email: email })
+
+    store.dispatch('toast/showToast', {
+      message: '驗證碼已重新發送',
+      type: 'success',
+    })
+  } catch (error) {
+    store.dispatch('toast/showToast', {
+      message: '驗證碼發送失敗，請稍後再試',
+      type: 'error',
+    })
+  } finally {
+    startCountdown() // 重新倒數
+    isResending.value = false
+  }
 }
+
+const handleSendOtpCode = debounce(handleSendOtpCodeOriginal, 200)
+const handleResendOtpCode = debounce(handleResendOtpCodeOriginal, 200)
 
 onMounted(() => {
   startCountdown()
@@ -111,9 +133,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearInterval(timer.value)
-
-  // 離開頁面時清除 Cookies 中的信箱
-  Cookies.remove('otpEmail')
 })
 </script>
 
@@ -227,7 +246,7 @@ onUnmounted(() => {
 
   transition: color 0.15s ease;
 
-  &:hover {
+  &:not(:disabled):hover {
     color: darken-color($primary-color, 10%);
   }
 }

@@ -1,7 +1,13 @@
 <template>
   <div class="form-group">
     <label :for="id">{{ label }}</label>
-    <input :type="type" :id="id" class="form-input" v-model="inputModel" />
+    <input
+      :type="type"
+      :id="id"
+      class="form-input"
+      v-model="inputModel"
+      :placeholder="placeholder"
+    />
     <slot></slot>
   </div>
 </template>
@@ -22,6 +28,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  placeholder: {
+    type: String,
+    default: '',
+  },
 })
 </script>
 
@@ -35,6 +45,7 @@ const props = defineProps({
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
+    color: #333;
   }
 
   .form-input {
@@ -49,6 +60,10 @@ const props = defineProps({
       outline: none;
       border-color: $primary-color;
       box-shadow: 0 0 0 2px rgba($primary-color, 0.1);
+    }
+
+    &::placeholder {
+      color: #aaa;
     }
   }
 }

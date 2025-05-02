@@ -1,9 +1,8 @@
 import store from '../../store/index.js'
-import Cookies from 'js-cookie'
 
 export function authGuard(to, from) {
+  const token = store.getters['auth/isAuthenticated']
   if (to.meta.requiresAuth) {
-    const token = store.getters['auth/isAuthenticated']
     if (!token) {
       return { name: 'Login', query: { redirect: to.fullPath } }
     }
@@ -18,7 +17,7 @@ export function authGuard(to, from) {
   }
 
   // otp 流程守衛
-  if (to.meta.otpOnly && !Cookies.get('otpEmail')) {
+  if (to.meta.otpOnly && !sessionStorage.getItem('registerEmail')) {
     return { name: 'Register' }
   }
 
@@ -28,6 +27,24 @@ export function authGuard(to, from) {
 
     if (!isFromOtpPage) {
       return { name: 'Register' }
+    }
+  }
+
+  if (to.meta.forgotPasswordProcessRequired) {
+    const isForgotPasswordPage = from.name === 'ForgotPassword'
+
+    if (!isForgotPasswordPage) {
+      return { name: 'Home' }
+    }
+  }
+
+  if (to.meta.resetPasswordProcessRequired) {
+    if (to.query.token) {
+      sessionStorage.setItem('resetPasswordToken', to.query.token)
+    }
+
+    if (!sessionStorage.getItem('resetPasswordToken')) {
+      return { name: 'ForgotPassword' }
     }
   }
 }

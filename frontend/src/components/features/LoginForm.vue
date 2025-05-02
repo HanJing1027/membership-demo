@@ -1,22 +1,13 @@
 <template>
-  <form class="">
+  <form @submit.prevent="handleSubmit" novalidate>
     <BaseInput label="帳號/信箱" type="email" id="email" v-model="form.email" />
 
     <BaseInput label="密碼" type="password" id="password" v-model="form.password" />
 
     <div class="form-actions">
-      <button
-        @click.prevent="handleSubmit"
-        type="submit"
-        class="btn btn-primary"
-        :disabled="isSubmitting"
-      >
+      <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
         <i class="bx bx-user"></i> {{ isSubmitting ? '處理中...' : '登入' }}
       </button>
-    </div>
-
-    <div class="form-footer">
-      還沒有帳號？ <router-link :to="{ name: 'Register' }">註冊新帳號</router-link>
     </div>
   </form>
 </template>
@@ -93,22 +84,6 @@ const handleSubmit = () => {
   }
 }
 
-.form-footer {
-  margin-top: 1.5rem;
-  text-align: center;
-  font-size: 0.875rem;
-
-  a {
-    color: $primary-color;
-    text-decoration: none;
-    font-weight: 500;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-}
-
 // RWD 樣式
 @media (max-width: 767px) {
   .form-actions {
@@ -138,10 +113,6 @@ const handleSubmit = () => {
         font-size: 1.1rem;
       }
     }
-  }
-
-  .form-footer {
-    margin-top: 1rem;
   }
 }
 

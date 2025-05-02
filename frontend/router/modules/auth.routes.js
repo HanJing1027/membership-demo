@@ -37,4 +37,33 @@ export default [
       RegistrationProcessRequired: true, // 需要註冊流程
     },
   },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: () => import('@/views/ForgotPassword.vue'),
+    meta: {
+      title: '忘記密碼',
+      guestOnly: true,
+    },
+  },
+  {
+    path: '/check-email',
+    name: 'CheckEmail',
+    component: () => import('@/views/CheckEmail.vue'),
+    meta: {
+      title: '檢查電子郵件',
+      guestOnly: true,
+      forgotPasswordProcessRequired: true, // 需要忘記密碼流程
+    },
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: () => import('@/views/ResetPassword.vue'),
+    meta: {
+      title: '重設密碼',
+      guestOnly: true,
+      resetPasswordProcessRequired: true, // 需要 query 中的 token
+    },
+  },
 ]

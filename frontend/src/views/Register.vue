@@ -1,5 +1,5 @@
 <template>
-  <div class="register-container">
+  <main class="register-container">
     <div class="register-form-wrapper">
       <h1 class="register-title">註冊帳號</h1>
 
@@ -9,23 +9,24 @@
         @validation-error="handleValidationError"
       />
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup>
 import RegisterForm from '@/components/features/RegisterForm.vue'
-import Cookies from 'js-cookie'
 
 import { membershipApi } from '@/server/api/membershipApi.js'
+import { useDebounce } from '@/composable/useDebounce'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { ref } from 'vue'
 
+const { debounce } = useDebounce()
 const router = useRouter()
 const store = useStore()
 const isSubmitting = ref(false)
 
-const handleValidationError = (error) => {
+const handleValidationErrorOriginal = (error) => {
   try {
     store.dispatch('toast/showToast', {
       show: true,
@@ -37,14 +38,13 @@ const handleValidationError = (error) => {
   }
 }
 
-const handleFormSubmit = async (formData) => {
+const handleFormSubmitOriginal = async (formData) => {
   try {
     isSubmitting.value = true
 
+    // 將 email 存入 sessionStorage
     const { email } = formData
-    Cookies.set('otpEmail', email, {
-      sameSite: 'Strict', // 嚴格模式防止 CSRF 攻擊
-    })
+    sessionStorage.setItem('registerEmail', email)
 
     //  API 請求
     await membershipApi.register(formData)
@@ -76,6 +76,9 @@ const handleFormSubmit = async (formData) => {
     isSubmitting.value = false
   }
 }
+
+const handleFormSubmit = debounce(handleFormSubmitOriginal, 500)
+const handleValidationError = debounce(handleValidationErrorOriginal, 200)
 </script>
 
 <style lang="scss" scoped>
