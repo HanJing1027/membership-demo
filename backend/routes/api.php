@@ -173,7 +173,7 @@ Route::middleware('auth:api')->get('/userData', function (Request $request) {
     return response()->json([
       'userInfo' => [
         'username' => $user->username,
-        'userAvatar' => $userAvatar?? null,
+        'userAvatar' => $userAvatar->avatar_filename?? null,
         'email' => $user->email,
         'createdAt' => $user->created_at
       ]
