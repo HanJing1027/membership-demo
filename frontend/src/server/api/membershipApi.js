@@ -163,7 +163,7 @@ export const membershipApi = {
   // 修改使用者資料
   editingUserData: async (userData) => {
     try {
-      const response = await api.post('/api/editUserData')
+      const response = await api.post('/api/updateUserData', userData)
       return response.data
     } catch (error) {
       handleError(error)
@@ -174,9 +174,18 @@ export const membershipApi = {
   // 修改用戶頭像
   uploadAvatar: async (formData) => {
     try {
-      const response = await api.post('/api/uploadAvatar', formData, {
+      const response = await api.post('/api/updateAvatar', formData, {
         transformRequest: null,
       })
+      return response.data
+    } catch (error) {
+      handleError(error)
+      throw error
+    }
+  },
+  updatePassword: async (userData) => {
+    try {
+      response = await api.post('/api/updatePassword', userData)
       return response.data
     } catch (error) {
       handleError(error)

@@ -66,4 +66,13 @@ export default [
       resetPasswordProcessRequired: true, // 需要 query 中的 token
     },
   },
+  {
+    path: '/update-password',
+    name: 'UpdatePassword',
+    component: () => import('@/views/UpdatePassword.vue'),
+    meta: {
+      title: '修改密碼',
+      requiresAuth: true,
+    },
+  },
 ]
