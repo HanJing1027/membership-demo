@@ -167,11 +167,13 @@ Route::middleware('auth:api')->get('/userData', function (Request $request) {
     if (!$user) {
       return response()->json(['message' => 'Unauthorized'], 401);
     }
+
+    $userAvatar = DB::table('user_avatars')->where('user_id', $user->id)->first();
     // 返回受保護的資料和用戶信息
     return response()->json([
       'userInfo' => [
         'username' => $user->username,
-        'userAvatar' => null,
+        'userAvatar' => $userAvatar?? null,
         'email' => $user->email,
         'createdAt' => $user->created_at
       ]
@@ -272,3 +274,73 @@ Route::post('/resetPassword', function (Request $request) {
   }
 })->name('resetPassword');
 #endregion
+
+#region 用戶資料更新
+Route::middleware('auth:api')->post('/updateUserData', function (Request $request) {
+  try {
+    // 獲取當前認證用戶
+    $user = Auth::guard('api')->user();
+    if (!$user) {
+      return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
+    $request->validate([
+      'username' => 'required|string'
+    ]);
+
+    $user->username = $request->username;
+    $user->save();
+
+    return response()->json(['message' => 'User data updated successfully'], 200);
+  } catch (\Exception $e) {
+    return response()->json(['message' => 'User data update failed', 'error' => $e->getMessage()], 500);
+  }
+})->name('updateUserData');
+#endregion
+
+#region 頭貼資料更新
+Route::middleware('auth:api')->post('/updateAvatar', function (Request $request) {
+  try {
+    // 獲取當前認證用戶
+    $user = Auth::guard('api')->user();
+    if (!$user) {
+      return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
+    $request->validate([
+      'avatar' => 'required|image|mimes:jpeg,png,jpg',
+    ]);
+
+    // 確保 avatars 資料夾存在
+    $avatarPath = public_path('avatars');
+    if (!file_exists($avatarPath)) {
+      mkdir($avatarPath, 0777, true);
+    }    
+
+    // 刪除舊的頭像記錄
+    $oldAvatar = DB::table('user_avatars')->where('user_id', $user->id)->first();
+    if ($oldAvatar) {
+      // 刪除舊的頭像文件
+      $oldAvatarPath = public_path('avatars/' . $oldAvatar->avatar_filename);
+      if (file_exists($oldAvatarPath)) {
+        unlink($oldAvatarPath);
+      }
+    }
+
+    $file = $request->file('avatar');
+    $filename = $user->username."_avatar.".$user->id.$file->extension();
+    $file->move($avatarPath, $filename);
+
+    // 插入新的頭像記錄
+    DB::table('user_avatars')->updateOrInsert([
+      'user_id' => $user->id,
+      'avatar_filename' => $filename,
+      'created_at' => now(),
+      'updated_at' => now()
+    ]);
+
+    return response()->json(['message' => 'Avatar uploaded successfully'], 200);
+  } catch (\Exception $e) {
+    return response()->json(['message' => 'Avatar upload failed', 'error' => $e->getMessage()], 500);
+  }
+})->name('uploadAvatar');
