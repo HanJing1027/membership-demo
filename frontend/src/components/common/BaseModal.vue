@@ -1,18 +1,20 @@
 <template>
-  <div class="modal-mask" v-if="modal.show">
-    <div class="modal-card">
-      <div class="modal-header">
-        <i class="bx" :class="modal.boxIcon"></i>
-      </div>
-      <div class="modal-body">
-        <h1 class="modal-title">{{ modal.title }}</h1>
-        <p class="modal-content">{{ modal.content }}</p>
-        <button class="modal-btn" v-if="modal.buttonText" @click="handleBtn">
-          {{ modal.buttonText }}
-        </button>
+  <transition name="modal-fade">
+    <div class="modal-mask" v-if="modal.show">
+      <div class="modal-card">
+        <div class="modal-header">
+          <i class="bx" :class="modal.boxIcon"></i>
+        </div>
+        <div class="modal-body">
+          <h1 class="modal-title">{{ modal.title }}</h1>
+          <p class="modal-content">{{ modal.content }}</p>
+          <button class="modal-btn" v-if="modal.buttonText" @click="handleBtn">
+            {{ modal.buttonText }}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script setup>
@@ -52,13 +54,38 @@ const handleBtn = debounce(handleBtnOriginal, 200)
 @use '@/assets/styles/variables' as *;
 @use '@/assets/styles/mixins' as *;
 
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+
+.modal-fade-enter-from .modal-container,
+.modal-fade-leave-to .modal-container {
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+.modal-fade-enter-active .modal-container,
+.modal-fade-leave-active .modal-container {
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+
 .modal-mask {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: #00000080;
   display: flex;
   justify-content: center;
   align-items: center;
