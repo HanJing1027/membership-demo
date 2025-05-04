@@ -340,7 +340,10 @@ Route::middleware('auth:api')->post('/updateAvatar', function (Request $request)
       ]
     );
 
-    return response()->json(['message' => 'Avatar uploaded successfully'], 200);
+    return response()->json([
+      'message' => 'Avatar uploaded successfully',
+      'userAvatarFilename' => $filename
+    ], 200);
   } catch (\Exception $e) {
     return response()->json(['message' => 'Avatar upload failed', 'error' => $e->getMessage()], 500);
   }
