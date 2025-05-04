@@ -1,5 +1,5 @@
 <template>
-  <div class="user-center">
+  <main class="user-center">
     <h1>會員中心</h1>
 
     <div class="profile-card">
@@ -7,7 +7,9 @@
       <div class="edit-controls">
         <button class="edit-btn" v-if="!isEditing" @click="startEditing">編輯檔案</button>
         <template v-else>
-          <button class="save-btn" @click="saveUserData">儲存</button>
+          <button class="save-btn" @click="saveUserData">
+            {{ isSaving ? '存儲中...' : '儲存' }}
+          </button>
           <button class="cancel-btn" @click="cancelEditing">取消</button>
         </template>
       </div>
@@ -16,18 +18,21 @@
         <!-- 左側頭像區 -->
         <div class="avatar-section">
           <div class="avatar">
-            <template v-if="userDataOriginal.userAvatar">
+            <!-- 編輯模式 + 有新頭像 -->
+            <template v-if="isEditing && newAvatarPreview">
+              <img :src="newAvatarPreview" alt="頭像預覽" />
+            </template>
+            <!--  瀏覽模式 + 舊頭像 -->
+            <template v-else-if="userDataOriginal.userAvatar">
               <img :src="userDataOriginal.userAvatar" alt="用戶頭像" />
             </template>
+            <!-- 無頭像 -->
             <template v-else>
               <span class="avatar-default">{{ avatarDefault }}</span>
             </template>
           </div>
 
-          <button class="change-avatar-btn" :disabled="!isEditing" @click="openFileInput">
-            更換頭像
-          </button>
-          <input ref="fileInput" type="file" accept="image/*" style="display: none" />
+          <button class="change-avatar-btn" @click="openImageUploadModal">更換頭像</button>
 
           <div class="join-info">
             <p class="join-label">加入時間</p>
@@ -68,10 +73,20 @@
         </div>
       </div>
     </div>
-  </div>
+
+    <ImageUploadModal
+      :isOpen="isImageModalOpen"
+      :isUploading="isAvatarUploading"
+      @close="closeImageUploadModal"
+      @uploadError="handleUploadError"
+      @uploadImage="habdleUploadAvatar"
+    />
+  </main>
 </template>
 
 <script setup>
+import ImageUploadModal from '@/components/features/ImageUploadModal.vue'
+
 import { useStore } from 'vuex'
 import { useDebounce } from '@/composable/useDebounce'
 import { membershipApi } from '@/server/api/membershipApi'
@@ -80,9 +95,12 @@ import { ref, computed, onMounted } from 'vue'
 const store = useStore()
 const { debounce } = useDebounce()
 
-const fileInput = ref(null) // 檔案選擇器
 const isEditing = ref(false)
+const isSaving = ref(false)
 const editingUserData = ref(null) // 用來備份原始資料(取消時可復原)
+const isImageModalOpen = ref(false)
+const isAvatarUploading = ref(false) // 上傳狀態
+const newAvatarPreview = ref(null) // 新頭像
 
 const userDataOriginal = ref({
   username: '',
@@ -104,6 +122,33 @@ const joinDate = computed(() => {
   return userDataOriginal.value.createdAt.split('T')[0]
 })
 
+// 打開圖片上傳模器
+const openImageUploadModal = () => {
+  isImageModalOpen.value = true
+}
+
+// 關閉圖片上傳模器
+const closeImageUploadModal = () => {
+  isImageModalOpen.value = false
+}
+
+// 處理圖片上傳錯誤
+const handleUploadError = async (data) => {
+  if (data.type === 'sizeError') {
+    store.dispatch('toast/showToast', {
+      type: 'error',
+      message: data.message,
+    })
+  }
+
+  if (data.type === 'typeError') {
+    store.dispatch('toast/showToast', {
+      type: 'error',
+      message: data.message,
+    })
+  }
+}
+
 // 開始編輯
 const startEditing = () => {
   isEditing.value = true
@@ -119,19 +164,14 @@ const cancelEditing = () => {
   editingUserData.value = null // 清除備份資料
 }
 
-// 更換頭像(打開檔案選擇器)
-const openFileInput = () => {
-  fileInput.value.click()
-}
-
 // 保存用戶資料
 const saveUserDataOriginal = async () => {
   try {
-    await membershipApi.editingUserData(editingUserData.value)
+    isSaving.value = true
 
-    // 更新成功後，更新本地資料
-    userDataOriginal.value.username = editingUserData.value.username // 測試
-    // getUserData()
+    await membershipApi.editingUserData({ username: editingUserData.value })
+
+    userDataOriginal.value.username = editingUserData.value.username
   } catch (error) {
     store.dispatch('toast/showToast', {
       type: 'error',
@@ -144,6 +184,33 @@ const saveUserDataOriginal = async () => {
 }
 
 const saveUserData = debounce(saveUserDataOriginal, 200)
+
+// 處理上傳
+const habdleUploadAvatar = async (data) => {
+  try {
+    isAvatarUploading.value = true
+
+    const formData = new FormData()
+    formData.append('avatar', data.file)
+
+    await membershipApi.uploadAvatar(formData)
+
+    getUserData()
+
+    store.dispatch('toast/showToast', {
+      type: 'success',
+      message: '',
+    })
+  } catch (error) {
+    store.dispatch('toast/showToast', {
+      type: 'error',
+      message: '頭像上傳失敗，請稍候再試',
+    })
+  } finally {
+    isImageModalOpen.value = false // 關閉
+    isAvatarUploading.value = false
+  }
+}
 
 onMounted(() => {
   getUserData() // 獲取用戶資料
@@ -271,11 +338,6 @@ onMounted(() => {
 
     &:hover {
       background-color: darken-color(#f5f5f5, 5%);
-    }
-
-    &:disabled {
-      background-color: #e0e0e0;
-      cursor: auto;
     }
   }
 
