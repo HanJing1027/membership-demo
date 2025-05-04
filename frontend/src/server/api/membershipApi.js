@@ -185,7 +185,7 @@ export const membershipApi = {
   },
   updatePassword: async (userData) => {
     try {
-      response = await api.post('/api/updatePassword', userData)
+      const response = await api.post('/api/updatePassword', userData)
       return response.data
     } catch (error) {
       handleError(error)

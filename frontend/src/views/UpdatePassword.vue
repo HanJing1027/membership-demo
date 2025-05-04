@@ -136,18 +136,18 @@ const handleResetPasswordOriginal = async () => {
     }, 5000)
   } catch (error) {
     if (error.response.status === 401) {
-      // 就密碼不正確
+      // 舊密碼不正確
       store.dispatch('modal/showModal', {
         title: '舊密碼不正確',
-        content: '連結已過期，請重新申請重設密碼',
+        content: '舊密碼不正確，請重新輸入',
         buttonText: '重新輸入',
         boxIcon: 'bx-x',
         buttonAction: 'close',
       })
     } else {
       store.dispatch('modal/showModal', {
-        title: '舊密碼不正確',
-        content: '連結已過期，請重新申請重設密碼',
+        title: '修改失敗',
+        content: '修改密碼失敗，請稍後再試',
         buttonText: '重新輸入',
         boxIcon: 'bx-x',
         buttonAction: 'close',
