@@ -185,7 +185,7 @@ Route::middleware('auth:api')->get('/userData', function (Request $request) {
 #endregion
 
 #region 用戶修改密碼
-Route::middleware('auth:api')->post('/updatepassword', function (Request $request) {
+Route::middleware('auth:api')->post('/updatePassword', function (Request $request) {
   try {
 
     // 獲取當前認證用戶
