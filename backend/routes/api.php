@@ -311,15 +311,33 @@ Route::middleware('auth:api')->post('/updateAvatar', function (Request $request)
       'avatar' => 'required|image|mimes:jpeg,png,jpg',
     ]);
 
+    // 確保 avatars 資料夾存在
+    $avatarPath = public_path('avatars');
+    if (!file_exists($avatarPath)) {
+      mkdir($avatarPath, 0777, true);
+    }    
+
+    // 刪除舊的頭像記錄
+    $oldAvatar = DB::table('user_avatars')->where('user_id', $user->id)->first();
+    if ($oldAvatar) {
+      // 刪除舊的頭像文件
+      $oldAvatarPath = public_path('avatars/' . $oldAvatar->avatar_filename);
+      if (file_exists($oldAvatarPath)) {
+        unlink($oldAvatarPath);
+      }
+    }
+
     $file = $request->file('avatar');
     $filename = $user->username."_avatar.".$user->id.$file->extension();
-    $file->move(public_path('avatars'), $filename);
+    $file->move($avatarPath, $filename);
 
-    // 更新用戶頭貼路徑
-    DB::table('user_avatars')->updateOrInsert(
-      ['avatar_filename' => $filename],
-      ['user_id' => $user->id]
-    );
+    // 插入新的頭像記錄
+    DB::table('user_avatars')->updateOrInsert([
+      'user_id' => $user->id,
+      'avatar_filename' => $filename,
+      'created_at' => now(),
+      'updated_at' => now()
+    ]);
 
     return response()->json(['message' => 'Avatar uploaded successfully'], 200);
   } catch (\Exception $e) {
