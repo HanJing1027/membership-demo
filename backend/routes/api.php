@@ -328,16 +328,17 @@ Route::middleware('auth:api')->post('/updateAvatar', function (Request $request)
     }
 
     $file = $request->file('avatar');
-    $filename = $user->username."_avatar.".$user->id.$file->extension();
+    $filename = "{$user->username}_avatar{$user->id}.{$file->extension()}";
     $file->move($avatarPath, $filename);
 
-    // 插入新的頭像記錄
-    DB::table('user_avatars')->updateOrInsert([
-      'user_id' => $user->id,
-      'avatar_filename' => $filename,
-      'created_at' => now(),
-      'updated_at' => now()
-    ]);
+    // 更新用戶頭像記錄
+    DB::table('user_avatars')->updateOrInsert(
+      ['user_id' => $user->id],
+      [
+        'avatar_filename' => $filename,
+        'updated_at' => now()
+      ]
+    );
 
     return response()->json(['message' => 'Avatar uploaded successfully'], 200);
   } catch (\Exception $e) {
