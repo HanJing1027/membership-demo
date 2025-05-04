@@ -117,7 +117,7 @@ const handleResetPasswordOriginal = async () => {
 
     store.dispatch('modal/showModal', {
       title: '修改成功',
-      content: '密碼已修改成功，5秒後將自動跳轉至登入頁面',
+      content: '請重新登入，5秒後將自動跳轉至登入頁面',
       buttonText: '前往登入',
       boxIcon: 'bx-check',
       buttonAction: 'close',
@@ -134,6 +134,8 @@ const handleResetPasswordOriginal = async () => {
       })
       store.dispatch('modal/hideModal')
     }, 5000)
+
+    store.dispatch('auth/logout')
   } catch (error) {
     if (error.response.status === 401) {
       // 舊密碼不正確
