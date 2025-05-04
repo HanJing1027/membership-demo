@@ -167,11 +167,13 @@ Route::middleware('auth:api')->get('/userData', function (Request $request) {
     if (!$user) {
       return response()->json(['message' => 'Unauthorized'], 401);
     }
+
+    $userAvatar = DB::table('user_avatars')->where('user_id', $user->id)->first();
     // 返回受保護的資料和用戶信息
     return response()->json([
       'userInfo' => [
         'username' => $user->username,
-        'userAvatar' => null,
+        'userAvatar' => $userAvatar?? null,
         'email' => $user->email,
         'createdAt' => $user->created_at
       ]
@@ -272,3 +274,55 @@ Route::post('/resetPassword', function (Request $request) {
   }
 })->name('resetPassword');
 #endregion
+
+#region 用戶資料更新
+Route::middleware('auth:api')->post('/updateUserData', function (Request $request) {
+  try {
+    // 獲取當前認證用戶
+    $user = Auth::guard('api')->user();
+    if (!$user) {
+      return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
+    $request->validate([
+      'username' => 'required|string'
+    ]);
+
+    $user->username = $request->username;
+    $user->save();
+
+    return response()->json(['message' => 'User data updated successfully'], 200);
+  } catch (\Exception $e) {
+    return response()->json(['message' => 'User data update failed', 'error' => $e->getMessage()], 500);
+  }
+})->name('updateUserData');
+#endregion
+
+#region 頭貼資料更新
+Route::middleware('auth:api')->post('/updateAvatar', function (Request $request) {
+  try {
+    // 獲取當前認證用戶
+    $user = Auth::guard('api')->user();
+    if (!$user) {
+      return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
+    $request->validate([
+      'avatar' => 'required|image|mimes:jpeg,png,jpg',
+    ]);
+
+    $file = $request->file('avatar');
+    $filename = $user->username."_avatar.".$user->id.$file->extension();
+    $file->move(public_path('avatars'), $filename);
+
+    // 更新用戶頭貼路徑
+    DB::table('user_avatars')->updateOrInsert(
+      ['avatar_filename' => $filename],
+      ['user_id' => $user->id]
+    );
+
+    return response()->json(['message' => 'Avatar uploaded successfully'], 200);
+  } catch (\Exception $e) {
+    return response()->json(['message' => 'Avatar upload failed', 'error' => $e->getMessage()], 500);
+  }
+})->name('uploadAvatar');
