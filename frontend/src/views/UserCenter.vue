@@ -177,6 +177,14 @@ const saveUserDataOriginal = async () => {
   try {
     isSaving.value = true
 
+    if (editingUserData.value.username === '') {
+      store.dispatch('toast/showToast', {
+        type: 'error',
+        message: '會員名稱不得為空',
+      })
+      return
+    }
+
     await membershipApi.editingUserData(editingUserData.value)
 
     userDataOriginal.value.username = editingUserData.value.username
