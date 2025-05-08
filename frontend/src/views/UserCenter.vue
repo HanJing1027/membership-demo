@@ -211,6 +211,14 @@ const habdleUploadAvatar = async (data) => {
     formData.append('avatar', data.file)
 
     const response = await membershipApi.uploadAvatar(formData)
+
+    // 更新本地用戶資料中的頭像路徑
+    if (response.avatarPath) {
+      userDataOriginal.value.userAvatar = response.avatarPath
+    } else {
+      await getUserData()
+    }
+
     avatarVersion.value++ // 增加版本號，強制瀏覽器重新請求圖片
 
     store.dispatch('toast/showToast', {
