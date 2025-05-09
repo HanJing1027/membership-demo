@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie'
-import { membershipApi } from '../../src/server/api/membershipApi'
+import { membershipApi } from '@/server/api/membershipApi'
 
 // cookie 設定
 const TOKEN_KEY = 'auth_token'

@@ -1,7 +1,7 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import store from '../../../store/index.js'
-import router from '../../../router/index.js'
+import store from '@/store/index.js'
+import router from '@/router/index.js'
 
 const api = axios.create()
 const TOKEN_KEY = 'auth_token' // Cookie 名稱，用於存儲 JWT token，需與 auth.js 保持一致以確保系統各部分能正確存取相同的認證信息

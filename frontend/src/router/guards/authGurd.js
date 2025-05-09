@@ -1,4 +1,4 @@
-import store from '../../store/index.js'
+import store from '@/store/index.js'
 
 export function authGuard(to, from) {
   const token = store.getters['auth/isAuthenticated']
