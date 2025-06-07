@@ -64,7 +64,7 @@ const regEmail = computed(() => {
 })
 
 const startCountdown = () => {
-  countdown.value = 2 // 60秒倒數
+  countdown.value = 60 // 60秒倒數
 
   // 設置計時器
   timer.value = setInterval(() => {
